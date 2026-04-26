@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nadia Aoussi Sophrologie</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--sand:#f5efe6;--sand-dark:#ede4d8;--sage:#7d9b76;--sage-light:#a8bf9e;--sage-dark:#4a6b47;--stone:#8a7d72;--stone-light:#c4b8ae;--cream:#faf7f2;--text:#2d2a27;--text-light:#6b6258;--danger:#c0392b;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);font-weight:300;overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:20px 50px;display:flex;justify-content:space-between;align-items:center;background:rgba(250,247,242,0.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(138,125,114,0.14);}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;cursor:pointer;letter-spacing:0.04em;}
+.nav-logo span{color:var(--sage);font-style:italic;}
+#navLinks{display:flex;gap:26px;list-style:none;align-items:center;flex-wrap:wrap;}
+#navLinks a{font-size:12px;color:var(--text-light);text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;transition:color .3s;cursor:pointer;}
+#navLinks a:hover,#navLinks a.active{color:var(--sage-dark);}
+.nav-cta{background:var(--sage)!important;color:#fff!important;padding:9px 22px!important;border-radius:40px;}
+.nav-cta:hover{background:var(--sage-dark)!important;}
+
+/* ── PAGES ── */
+.page{display:none;}.page.active{display:block;}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:120px 60px 80px;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 40%,rgba(125,155,118,.12) 0%,transparent 60%),radial-gradient(ellipse 50% 80% at 20% 80%,rgba(201,133,108,.08) 0%,transparent 50%),var(--cream);}
+.hero-orb{position:absolute;right:-100px;top:50%;transform:translateY(-50%);width:620px;height:620px;border-radius:50%;background:linear-gradient(135deg,var(--sage-light),var(--sage-dark));opacity:.16;animation:breathe 6s ease-in-out infinite;}
+.hero-ring{position:absolute;right:80px;top:50%;transform:translateY(-50%);width:460px;height:460px;border-radius:50%;border:1px solid rgba(125,155,118,.22);animation:breathe 8s ease-in-out infinite reverse;}
+@keyframes breathe{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-50%) scale(1.04)}}
+.hero-content{position:relative;z-index:2;max-width:600px;}
+.hero-eyebrow{font-size:11px;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:var(--sage);margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+.hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--sage);}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(50px,6vw,80px);font-weight:300;line-height:1.06;margin-bottom:28px;}
+.hero h1 em{font-style:italic;color:var(--sage-dark);}
+.hero-desc{font-size:16px;line-height:1.8;color:var(--text-light);max-width:460px;margin-bottom:44px;}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;}
+
+/* ── BUTTONS ── */
+.btn-primary{background:var(--sage);color:#fff;padding:14px 32px;border-radius:40px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px;font-family:'Jost',sans-serif;font-weight:400;}
+.btn-primary:hover{background:var(--sage-dark);transform:translateY(-2px);box-shadow:0 12px 28px rgba(74,107,71,.25);}
+.btn-outline{background:transparent;color:var(--text);padding:14px 32px;border-radius:40px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--stone-light);cursor:pointer;transition:all .3s;font-family:'Jost',sans-serif;}
+.btn-outline:hover{border-color:var(--sage);color:var(--sage-dark);transform:translateY(-2px);}
+.btn-save{background:var(--sage);color:#fff;padding:11px 26px;border-radius:28px;font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:7px;font-family:'Jost',sans-serif;}
+.btn-save:hover{background:var(--sage-dark);transform:translateY(-1px);}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;font-family:'Jost',sans-serif;}
+.btn-danger:hover{background:var(--danger);color:#fff;}
+.btn-add{background:var(--sand);color:var(--sage-dark);border:2px dashed var(--sage-light);padding:13px 24px;border-radius:12px;font-size:13px;cursor:pointer;width:100%;transition:all .25s;font-family:'Jost',sans-serif;margin-top:6px;}
+.btn-add:hover{background:var(--sage-light);color:#fff;border-color:var(--sage-light);}
+.btn-sm{background:var(--sand);border:none;padding:6px 13px;border-radius:18px;font-size:12px;cursor:pointer;color:var(--sage-dark);transition:all .2s;font-family:'Jost',sans-serif;}
+.btn-sm:hover{background:var(--sage-light);color:#fff;}
+
+/* ── SECTIONS ── */
+section{padding:90px 60px;}
+.section-header{text-align:center;margin-bottom:64px;}
+.section-tag{font-size:11px;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:var(--sage);margin-bottom:14px;display:block;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,4vw,52px);font-weight:300;line-height:1.15;}
+.section-title em{font-style:italic;color:var(--sage-dark);}
+.section-sub{font-size:15px;line-height:1.8;color:var(--text-light);max-width:500px;margin:16px auto 0;}
+.divider{width:40px;height:1px;background:var(--sage-light);margin:20px auto 0;}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;max-width:1080px;margin:0 auto;}
+.about-visual{position:relative;}
+.about-img-frame{width:100%;aspect-ratio:4/5;border-radius:40% 60% 50% 50%/40% 40% 60% 60%;background:linear-gradient(145deg,var(--sage-light),var(--sage-dark));display:flex;align-items:center;justify-content:center;font-size:90px;color:rgba(255,255,255,.4);animation:shapeBreath 7s ease-in-out infinite;position:relative;overflow:hidden;}
+@keyframes shapeBreath{0%,100%{border-radius:40% 60% 50% 50%/40% 40% 60% 60%}50%{border-radius:50% 50% 40% 60%/60% 50% 50% 40%}}
+.about-badge{position:absolute;bottom:28px;right:-16px;background:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 16px 48px rgba(0,0,0,.1);text-align:center;}
+.about-badge strong{display:block;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--sage-dark);}
+.about-badge span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);}
+.about-text h2{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,3.5vw,46px);font-weight:300;line-height:1.2;margin-bottom:24px;}
+.about-text h2 em{font-style:italic;color:var(--sage-dark);}
+.about-text p{font-size:15px;line-height:1.85;color:var(--text-light);margin-bottom:18px;}
+.about-signature{font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;color:var(--sage);margin-top:28px;}
+
+/* ── SOINS ── */
+.soins-bg{background:var(--sand);}
+.soins-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto;}
+.soin-card{background:#fff;border-radius:20px;overflow:hidden;transition:all .4s;border:1px solid transparent;position:relative;}
+.soin-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--sage-light),var(--sage-dark));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.soin-card:hover{transform:translateY(-5px);box-shadow:0 20px 56px rgba(74,107,71,.12);border-color:rgba(125,155,118,.2);}
+.soin-card:hover::before{transform:scaleX(1);}
+.soin-img{width:100%;height:200px;object-fit:cover;display:block;}
+.soin-placeholder{width:100%;height:200px;display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(135deg,var(--sand),var(--sage-light));}
+.soin-body{padding:28px 26px 26px;}
+.soin-card h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:10px;}
+.soin-card p{font-size:14px;line-height:1.75;color:var(--text-light);margin-bottom:18px;}
+.soin-tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);font-weight:500;}
+
+/* ── TARIFS ── */
+.tarifs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto;}
+.tarif-card{background:#fff;border-radius:20px;padding:36px 28px;text-align:center;border:1px solid var(--sand-dark);transition:all .4s;}
+.tarif-card.featured{background:var(--sage-dark);color:#fff;border-color:transparent;transform:scale(1.04);box-shadow:0 24px 60px rgba(74,107,71,.28);}
+.tarif-card:hover:not(.featured){border-color:var(--sage-light);transform:translateY(-4px);}
+.tarif-card h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:18px;}
+.tarif-prix{font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:300;line-height:1;margin-bottom:4px;}
+.tarif-prix sup{font-size:18px;vertical-align:top;margin-top:8px;}
+.tarif-duree{font-size:12px;letter-spacing:.1em;opacity:.6;text-transform:uppercase;margin-bottom:24px;}
+.tarif-features{list-style:none;margin-bottom:28px;}
+.tarif-features li{font-size:13px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);color:var(--text-light);}
+.tarif-card.featured .tarif-features li{border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.75);}
+.btn-tarif{width:100%;padding:12px;border-radius:30px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s;border:1px solid var(--sage);background:transparent;color:var(--sage-dark);font-family:'Jost',sans-serif;}
+.tarif-card.featured .btn-tarif{background:#fff;color:var(--sage-dark);border-color:#fff;}
+.btn-tarif:hover{background:var(--sage);color:#fff;}
+
+/* ── CONTACT ── */
+.contact-bg{background:var(--sand);}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;max-width:980px;margin:0 auto;}
+.contact-info h3{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:22px;}
+.contact-item{display:flex;gap:14px;margin-bottom:24px;align-items:flex-start;}
+.ci-icon{width:38px;height:38px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ci-text strong{display:block;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);margin-bottom:3px;}
+.contact-form .fg{margin-bottom:18px;}
+.contact-form label{display:block;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);margin-bottom:7px;}
+.contact-form input,.contact-form textarea,.contact-form select{width:100%;padding:13px 16px;background:#fff;border:1px solid var(--sand-dark);border-radius:10px;font-family:'Jost',sans-serif;font-size:14px;font-weight:300;color:var(--text);outline:none;transition:border-color .3s;}
+.contact-form input:focus,.contact-form textarea:focus,.contact-form select:focus{border-color:var(--sage-light);}
+.contact-form textarea{height:110px;resize:vertical;}
+
+/* ── CUSTOM PAGES ── */
+.custom-wrap{padding-top:80px;}
+.custom-inner{max-width:860px;margin:0 auto;padding:60px 60px 90px;}
+.custom-inner h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,66px);font-weight:300;line-height:1.1;margin-bottom:28px;}
+.custom-inner h1 em{font-style:italic;color:var(--sage-dark);}
+.custom-body{font-size:16px;line-height:1.9;color:var(--text-light);white-space:pre-wrap;}
+.custom-cover{width:100%;max-height:420px;object-fit:cover;border-radius:20px;margin-bottom:40px;}
+
+/* ── FOOTER ── */
+footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:18px;}
+.footer-logo span{color:var(--sage-light);font-style:italic;}
+#footerLinks{display:flex;justify-content:center;gap:24px;margin-bottom:20px;flex-wrap:wrap;}
+#footerLinks a{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:color .3s;}
+#footerLinks a:hover{color:var(--sage-light);}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.25);}
+
+/* ── ADMIN ── */
+.admin-page{min-height:100vh;background:#f0f2f5;padding-top:80px;}
+.admin-login-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 80px);}
+.admin-login-box{background:#fff;border-radius:20px;padding:52px 44px;width:100%;max-width:420px;box-shadow:0 20px 56px rgba(0,0,0,.08);text-align:center;}
+.admin-login-box h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:6px;}
+.admin-login-box .sub{font-size:14px;color:var(--text-light);margin-bottom:32px;}
+.admin-login-box input{width:100%;padding:13px 16px;border:1px solid #e0e0e0;border-radius:10px;font-family:'Jost',sans-serif;font-size:14px;margin-bottom:12px;outline:none;transition:border-color .3s;}
+.admin-login-box input:focus{border-color:var(--sage-light);}
+.login-error{font-size:13px;color:var(--danger);margin-bottom:12px;display:none;}
+.admin-dash{display:none;}
+.admin-dash.active{display:flex;min-height:calc(100vh - 80px);}
+.admin-sidebar{width:262px;background:#fff;padding:28px 18px;border-right:1px solid #eee;flex-shrink:0;overflow-y:auto;}
+.admin-sidebar h3{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:400;padding-bottom:18px;border-bottom:1px solid #eee;margin-bottom:18px;}
+.admin-menu{list-style:none;}
+.admin-menu li{margin-bottom:2px;}
+.admin-menu a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:13px;color:var(--text-light);cursor:pointer;transition:all .22s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.admin-menu a:hover,.admin-menu a.active{background:var(--sand);color:var(--sage-dark);}
+.msec{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--stone-light);padding:14px 12px 5px;}
+.admin-content{flex:1;padding:36px 40px;overflow-y:auto;}
+.admin-content>h2{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid #eee;}
+.admin-panel{display:none;}.admin-panel.active{display:block;}
+.acard{background:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+.acard h4{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.af{margin-bottom:15px;}
+.af label{display:block;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;}
+.af input,.af textarea,.af select{width:100%;padding:11px 14px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Jost',sans-serif;font-size:14px;font-weight:300;color:var(--text);outline:none;transition:border-color .3s;background:#fafafa;}
+.af input:focus,.af textarea:focus,.af select:focus{border-color:var(--sage-light);background:#fff;}
+.af textarea{height:88px;resize:vertical;}
+.af input[type=checkbox]{width:auto;margin-right:6px;}
+.af input[type=range]{padding:4px 0;background:none;border:none;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* Photo upload */
+.upload-zone{border:2px dashed var(--sage-light);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .25s;background:var(--sand);position:relative;overflow:hidden;}
+.upload-zone:hover{border-color:var(--sage);background:rgba(125,155,118,.07);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-lbl{font-size:13px;color:var(--text-light);pointer-events:none;display:flex;align-items:center;justify-content:center;gap:8px;}
+.upload-preview{width:100%;height:130px;object-fit:cover;border-radius:8px;margin-top:10px;display:none;}
+.upload-preview.show{display:block;}
+.remove-photo{font-size:11px;color:var(--danger);cursor:pointer;margin-top:6px;display:inline-block;background:none;border:none;font-family:'Jost',sans-serif;}
+
+/* Soin admin card */
+.sac{background:#fff;border-radius:12px;border:1px solid #eee;margin-bottom:12px;overflow:hidden;}
+.sac-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fafafa;border-bottom:1px solid #f0f0f0;cursor:pointer;user-select:none;}
+.sac-thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.sac-emoji{width:40px;height:40px;border-radius:8px;background:var(--sand);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.sac-label{flex:1;font-size:13px;font-weight:500;}
+.sac-toggle{background:none;border:none;cursor:pointer;font-size:17px;color:var(--text-light);}
+.sac-body{padding:16px 16px 12px;}.sac-body.collapsed{display:none;}
+
+/* Nav manager table */
+.nav-table{width:100%;border-collapse:collapse;font-size:13px;}
+.nav-table th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-light);padding:8px 10px;border-bottom:2px solid #eee;font-weight:500;}
+.nav-table td{padding:10px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.nav-table tr:last-child td{border-bottom:none;}
+.nav-table tr.fixed-row td{background:#fafafa;}
+.nav-table input[type=text]{width:100%;padding:7px 10px;border:1px solid #e0e0e0;border-radius:6px;font-family:'Jost',sans-serif;font-size:13px;outline:none;transition:border-color .3s;}
+.nav-table input[type=text]:focus{border-color:var(--sage-light);}
+.nav-table .page-type{font-size:11px;color:var(--stone-light);letter-spacing:.05em;}
+.toggle-vis{background:none;border:none;font-size:18px;cursor:pointer;padding:2px 4px;border-radius:6px;transition:background .2s;}
+.toggle-vis:hover{background:var(--sand);}
+.page-list-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;border-radius:10px;border:1px solid #eee;margin-bottom:8px;}
+.pli-info .name{font-size:14px;font-weight:500;}
+.pli-info .slug{font-size:11px;color:var(--stone-light);margin-top:2px;}
+.pli-actions{display:flex;gap:8px;flex-shrink:0;}
+
+/* Password change */
+.pwd-strength{height:4px;border-radius:4px;background:#eee;margin-top:6px;overflow:hidden;}
+.pwd-bar{height:100%;width:0;border-radius:4px;transition:all .3s;}
+
+/* New page form */
+.new-page-form{background:#fff;border-radius:14px;border:2px dashed var(--sage-light);padding:24px;margin-top:14px;}
+.new-page-form h4{font-family:'Cormorant Garamond',serif;font-size:18px;margin-bottom:16px;color:var(--sage-dark);font-weight:400;}
+
+/* Toast */
+.toast{display:none;position:fixed;bottom:26px;right:26px;background:var(--sage-dark);color:#fff;padding:13px 22px;border-radius:28px;font-size:13px;box-shadow:0 8px 24px rgba(74,107,71,.3);z-index:9999;animation:slideUp .3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:18px;padding:34px;width:90%;max-width:660px;max-height:88vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.15);}
+.modal-box>h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light);}
+
+@media(max-width:768px){
+  nav{padding:16px 20px;}#navLinks{display:none;}
+  section{padding:60px 22px;}.hero{padding:100px 22px 60px;}
+  .hero-orb,.hero-ring{display:none;}
+  .about-grid,.contact-grid{grid-template-columns:1fr;gap:40px;}
+  .soins-grid,.tarifs-grid{grid-template-columns:1fr;}
+  .tarif-card.featured{transform:none;}
+  .admin-sidebar{width:180px;padding:18px 10px;}.admin-content{padding:18px 20px;}
+  footer{padding:36px 22px;}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo" onclick="goPage('home')">Nadia Aoussi <span>Sophrologie</span></div>
+  <ul id="navLinks">
+    <!-- Built dynamically -->
+  </ul>
+</nav>
+
+<!-- ═══ PAGE ACCUEIL ═══ -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-bg"></div><div class="hero-orb"></div><div class="hero-ring"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Sophrologie &amp; bien-être</p>
+      <h1 id="hero-title">Retrouvez votre <em>équilibre intérieur</em></h1>
+      <p class="hero-desc" id="hero-desc">La sophrologie est un voyage vers soi. À travers des techniques douces de relaxation et de visualisation positive, je vous accompagne vers un mieux-être durable.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="goPage('contact')">Prendre rendez-vous →</button>
+        <button class="btn-outline" onclick="goPage('about')">En savoir plus</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ PAGE À PROPOS ═══ -->
+<div class="page" id="page-about">
+  <section style="padding-top:140px">
+    <div class="about-grid">
+      <div class="about-visual">
+        <div class="about-img-frame" id="about-frame">🌿</div>
+        <div class="about-badge"><strong>10+</strong><span>Années d'expérience</span></div>
+      </div>
+      <div class="about-text">
+        <span class="section-tag">Votre sophrologue</span>
+        <h2 id="about-title">Une approche <em>douce et personnalisée</em></h2>
+        <p id="about-p1">Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l'écoute de chaque personne dans sa singularité.</p>
+        <p id="about-p2">Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.</p>
+        <div class="about-signature" id="about-sig">— Marie Beaumont</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ PAGE SOINS ═══ -->
+<div class="page" id="page-soins">
+  <section class="soins-bg">
+    <div class="section-header">
+      <span class="section-tag">Mes accompagnements</span>
+      <h2 class="section-title" id="soins-heading">Des séances <em>adaptées</em> à vos besoins</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="soins-grid" id="soins-container"></div>
+  </section>
+</div>
+
+<!-- ═══ PAGE TARIFS ═══ -->
+<div class="page" id="page-tarifs">
+  <section>
+    <div class="section-header">
+      <span class="section-tag">Investir en soi</span>
+      <h2 class="section-title" id="tarifs-heading">Mes <em>tarifs</em></h2>
+      <p class="section-sub" id="tarifs-sub">Des formules adaptées à vos besoins et à votre rythme.</p>
+      <div class="divider"></div>
+    </div>
+    <div class="tarifs-grid" id="tarifs-container"></div>
+  </section>
+</div>
+
+<!-- ═══ PAGE CONTACT ═══ -->
+<div class="page" id="page-contact">
+  <section class="contact-bg" style="padding-top:140px">
+    <div class="section-header">
+      <span class="section-tag">Me contacter</span>
+      <h2 class="section-title" id="contact-heading">Prendre <em>rendez-vous</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3 id="contact-title">Je suis à votre écoute</h3>
+        <div class="contact-item"><div class="ci-icon">📍</div><div class="ci-text"><strong>Cabinet</strong><span id="contact-adresse">12 rue des Lilas, 75006 Paris</span></div></div>
+        <div class="contact-item"><div class="ci-icon">📞</div><div class="ci-text"><strong>Téléphone</strong><span id="contact-tel">06 12 34 56 78</span></div></div>
+        <div class="contact-item"><div class="ci-icon">✉️</div><div class="ci-text"><strong>Email</strong><span id="contact-email">contact@serena-sophrologie.fr</span></div></div>
+        <div class="contact-item"><div class="ci-icon">🕐</div><div class="ci-text"><strong>Horaires</strong><span id="contact-horaires">Lun–Ven : 9h–19h · Sam : 9h–13h</span></div></div>
+      </div>
+      <div class="contact-form">
+        <div class="fg"><label>Prénom et nom</label><input type="text" placeholder="Marie Dupont"></div>
+        <div class="fg"><label>Email</label><input type="email" placeholder="marie@email.com"></div>
+        <div class="fg"><label>Objet</label><select><option>Première consultation</option><option>Suivi sophrologie</option><option>Renseignements</option></select></div>
+        <div class="fg"><label>Message</label><textarea placeholder="Dites-moi comment je peux vous aider…"></textarea></div>
+        <button class="btn-primary" style="width:100%;justify-content:center">Envoyer →</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ CUSTOM PAGES (injected) ═══ -->
+<div id="custom-pages-container"></div>
+
+<!-- ═══ PAGE ADMIN ═══ -->
+<div class="page admin-page" id="page-admin">
+
+  <!-- LOGIN -->
+  <div class="admin-login-screen" id="loginScreen">
+    <div class="admin-login-box">
+      <div style="font-size:40px;margin-bottom:12px">🌿</div>
+      <h2>Espace Administration</h2>
+      <p class="sub">Accès réservé</p>
+      <p class="login-error" id="loginError">Identifiants incorrects, réessayez.</p>
+      <input type="text" id="loginUser" placeholder="Identifiant" autocomplete="username">
+      <input type="password" id="loginPass" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">Connexion →</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="admin-dash" id="adminDash">
+    <div class="admin-sidebar">
+      <h3>🌿 Admin</h3>
+      <ul class="admin-menu" id="adminMenu">
+        <div class="msec">Pages fixes</div>
+        <li><a onclick="showPanel('p-hero')" id="m-hero" class="active">🏠 Accueil</a></li>
+        <li><a onclick="showPanel('p-about')" id="m-about">👤 À propos</a></li>
+        <li><a onclick="showPanel('p-soins')" id="m-soins">🌿 Soins</a></li>
+        <li><a onclick="showPanel('p-tarifs')" id="m-tarifs">💶 Tarifs</a></li>
+        <li><a onclick="showPanel('p-contact')" id="m-contact">📬 Contact</a></li>
+        <div id="custom-menu-section"></div>
+        <div class="msec">Gestion</div>
+        <li><a onclick="showPanel('p-nav')" id="m-nav">🧭 Gérer la navigation</a></li>
+        <li><a onclick="showPanel('p-pages')" id="m-pages">➕ Nouvelles pages</a></li>
+        <li><a onclick="showPanel('p-security')" id="m-security">🔐 Sécurité</a></li>
+        <li style="margin-top:20px;border-top:1px solid #eee;padding-top:14px"><a onclick="doLogout()">🚪 Déconnexion</a></li>
+      </ul>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- PANEL ACCUEIL -->
+      <div class="admin-panel active" id="p-hero">
+        <h2>Page Accueil</h2>
+        <div class="acard"><h4>Texte hero</h4>
+          <div class="af"><label>Titre (utilisez &lt;em&gt;texte&lt;/em&gt; pour l'italique coloré)</label><input type="text" id="a-hero-title"></div>
+          <div class="af"><label>Description</label><textarea id="a-hero-desc"></textarea></div>
+          <button class="btn-save" onclick="saveHero()">✓ Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- PANEL À PROPOS -->
+      <div class="admin-panel" id="p-about">
+        <h2>Page À propos</h2>
+        <div class="acard"><h4>Photo de profil</h4>
+          <div class="upload-zone">
+            <input type="file" id="about-photo-file" accept="image/*" onchange="handlePhoto(this,'about-photo-prev',setAboutPhoto)">
+            <p class="upload-lbl">📷 Cliquez pour uploader votre photo</p>
+            <img id="about-photo-prev" class="upload-preview" src="" alt="">
+          </div>
+          <button class="remove-photo" onclick="clearAboutPhoto()" id="about-photo-rm" style="display:none">✕ Retirer la photo</button>
+        </div>
+        <div class="acard"><h4>Textes</h4>
+          <div class="af"><label>Titre (balise &lt;em&gt; pour l'italique)</label><input type="text" id="a-about-title"></div>
+          <div class="row2">
+            <div class="af"><label>Paragraphe 1</label><textarea id="a-about-p1"></textarea></div>
+            <div class="af"><label>Paragraphe 2</label><textarea id="a-about-p2"></textarea></div>
+          </div>
+          <div class="af"><label>Signature / Nom</label><input type="text" id="a-about-sig"></div>
+          <button class="btn-save" onclick="saveAbout()">✓ Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- PANEL SOINS -->
+      <div class="admin-panel" id="p-soins">
+        <h2>Soins &amp; Accompagnements</h2>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:20px">Chaque soin peut avoir une <strong>photo</strong> à la place de l'emoji. Cliquez sur l'en-tête pour déplier/plier.</p>
+        <div id="soins-admin-list"></div>
+        <button class="btn-add" onclick="addSoin()">＋ Ajouter un soin</button>
+        <div style="margin-top:18px"><button class="btn-save" onclick="saveSoins()">✓ Enregistrer tous les soins</button></div>
+      </div>
+
+      <!-- PANEL TARIFS -->
+      <div class="admin-panel" id="p-tarifs">
+        <h2>Tarifs</h2>
+        <div class="acard"><h4>Texte introductif</h4>
+          <div class="af"><label>Sous-titre</label><input type="text" id="a-tarifs-sub"></div>
+        </div>
+        <div id="tarifs-admin-list"></div>
+        <button class="btn-save" onclick="saveTarifs()">✓ Enregistrer</button>
+      </div>
+
+      <!-- PANEL CONTACT -->
+      <div class="admin-panel" id="p-contact">
+        <h2>Informations de contact</h2>
+        <div class="acard"><h4>Coordonnées</h4>
+          <div class="af"><label>Titre</label><input type="text" id="a-ct-title"></div>
+          <div class="row2">
+            <div class="af"><label>Adresse</label><input type="text" id="a-ct-adresse"></div>
+            <div class="af"><label>Téléphone</label><input type="text" id="a-ct-tel"></div>
+          </div>
+          <div class="row2">
+            <div class="af"><label>Email</label><input type="text" id="a-ct-email"></div>
+            <div class="af"><label>Horaires</label><input type="text" id="a-ct-horaires"></div>
+          </div>
+          <button class="btn-save" onclick="saveContact()">✓ Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- PANEL NAVIGATION (gérer titres + visibilité) -->
+      <div class="admin-panel" id="p-nav">
+        <h2>Gérer la navigation</h2>
+        <div class="acard">
+          <h4>Pages fixes — titres &amp; visibilité</h4>
+          <p style="font-size:13px;color:var(--text-light);margin-bottom:16px">Modifiez les libellés affichés dans le menu. Masquez ou affichez chaque page avec l'icône 👁.</p>
+          <table class="nav-table" id="fixed-nav-table">
+            <thead><tr><th>Page</th><th>Libellé dans le menu</th><th>Type</th><th style="text-align:center">Visible</th></tr></thead>
+            <tbody id="fixed-nav-body"></tbody>
+          </table>
+          <div style="margin-top:16px"><button class="btn-save" onclick="saveNavTitles()">✓ Enregistrer les libellés</button></div>
+        </div>
+        <div class="acard" id="custom-nav-table-card" style="display:none">
+          <h4>Pages personnalisées</h4>
+          <table class="nav-table">
+            <thead><tr><th>Page</th><th>Libellé dans le menu</th><th style="text-align:center">Visible</th><th></th></tr></thead>
+            <tbody id="custom-nav-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANEL NOUVELLES PAGES -->
+      <div class="admin-panel" id="p-pages">
+        <h2>Pages personnalisées</h2>
+        <div class="acard">
+          <h4>Pages créées</h4>
+          <div id="pages-list"><p style="color:var(--text-light);font-size:14px">Aucune page personnalisée pour l'instant.</p></div>
+        </div>
+        <div class="new-page-form">
+          <h4>✚ Créer une nouvelle page</h4>
+          <div class="row2">
+            <div class="af"><label>Libellé dans le menu</label><input type="text" id="np-nav" placeholder="Ex : Témoignages"></div>
+            <div class="af"><label>Grand titre sur la page</label><input type="text" id="np-heading" placeholder="Ex : Ce que disent mes clients"></div>
+          </div>
+          <div class="af"><label>Sous-titre / accroche</label><input type="text" id="np-sub" placeholder="Optionnel"></div>
+          <div class="af"><label>Contenu</label><textarea id="np-body" style="height:140px" placeholder="Votre texte ici…"></textarea></div>
+          <div class="af"><label>Image de couverture (optionnel)</label>
+            <div class="upload-zone">
+              <input type="file" id="np-photo-file" accept="image/*" onchange="handlePhoto(this,'np-photo-prev',null)">
+              <p class="upload-lbl">📷 Cliquez pour ajouter une image</p>
+              <img id="np-photo-prev" class="upload-preview" src="" alt="">
+            </div>
+          </div>
+          <button class="btn-save" onclick="createCustomPage()" style="margin-top:8px">✚ Créer la page</button>
+        </div>
+      </div>
+
+      <!-- PANEL SÉCURITÉ -->
+      <div class="admin-panel" id="p-security">
+        <h2>Sécurité — Changer le mot de passe</h2>
+        <div class="acard">
+          <h4>Nouveau mot de passe</h4>
+          <p style="font-size:13px;color:var(--text-light);margin-bottom:18px">Le mot de passe est stocké de façon sécurisée (hashé SHA-256) dans votre navigateur. Il sera demandé à chaque connexion.</p>
+          <div class="af"><label>Mot de passe actuel</label><input type="password" id="pwd-current" placeholder="Entrez le mot de passe actuel"></div>
+          <div class="af"><label>Nouveau mot de passe</label>
+            <input type="password" id="pwd-new" placeholder="Minimum 8 caractères" oninput="checkPwdStrength(this.value)">
+            <div class="pwd-strength"><div class="pwd-bar" id="pwd-bar"></div></div>
+            <small id="pwd-hint" style="font-size:11px;color:var(--text-light);margin-top:4px;display:block"></small>
+          </div>
+          <div class="af"><label>Confirmer le nouveau mot de passe</label><input type="password" id="pwd-confirm" placeholder="Répétez le mot de passe"></div>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <button class="btn-save" onclick="changePassword()">🔐 Mettre à jour le mot de passe</button>
+            <span id="pwd-msg" style="font-size:13px"></span>
+          </div>
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid #eee">
+            <p style="font-size:13px;color:var(--text-light);margin-bottom:10px"><strong>Identifiant actuel :</strong> <code id="current-username-display" style="background:var(--sand);padding:2px 8px;border-radius:4px"></code></p>
+            <div class="af"><label>Changer l'identifiant</label><input type="text" id="new-username" placeholder="Nouvel identifiant"></div>
+            <button class="btn-save" onclick="changeUsername()">✓ Changer l'identifiant</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM PAGE ADMIN PANELS (injected) -->
+      <div id="custom-admin-panels"></div>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-dash -->
+</div><!-- /page-admin -->
+
+<!-- ═══ FOOTER ═══ -->
+<footer id="mainFooter">
+  <div class="footer-logo">Nadia Aoussi <span>Sophrologie</span></div>
+  <div id="footerLinks"></div>
+  <p class="footer-copy">© 2025 Nadia Aoussi Sophrologie · Tous droits réservés</p>
+</footer>
+
+<div class="toast" id="toast">✓ Modifications enregistrées !</div>
+
+<!-- MODAL EDIT CUSTOM PAGE -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <h3>Modifier la page <button class="modal-close" onclick="closeModal()">✕</button></h3>
+    <input type="hidden" id="em-id">
+    <div class="row2">
+      <div class="af"><label>Libellé menu</label><input type="text" id="em-nav"></div>
+      <div class="af"><label>Grand titre</label><input type="text" id="em-heading"></div>
+    </div>
+    <div class="af"><label>Sous-titre</label><input type="text" id="em-sub"></div>
+    <div class="af"><label>Contenu</label><textarea id="em-body" style="height:150px"></textarea></div>
+    <div class="af"><label>Image de couverture</label>
+      <div class="upload-zone">
+        <input type="file" id="em-photo-file" accept="image/*" onchange="handlePhoto(this,'em-photo-prev',null)">
+        <p class="upload-lbl">📷 Changer l'image</p>
+        <img id="em-photo-prev" class="upload-preview" src="" alt="">
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn-save" onclick="saveEditPage()">✓ Enregistrer</button>
+      <button class="btn-danger" onclick="confirmDeletePage()">🗑 Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// SECURITY — hashed credentials stored in memory
+// Change default password in the CREDENTIALS object below
+// ══════════════════════════════════════════════════
+// Default: login=admin  password=sophrologie
+// To change: use the Security panel in admin, or replace the hash below.
+// Hash is SHA-256. You can generate one at https://emn178.github.io/online-tools/sha256.html
+
+async function sha256(msg){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// Stored credentials (hash of "sophrologie")
+let CREDENTIALS = {
+  username: localStorage.getItem('site_username') || 'admin',
+  passwordHash: localStorage.getItem('site_pwd_hash') || 'a8c37650e37b4e4b3e2b8f4c7c8a2f1e6b3d9c0e5a7f2b8d4c6e9a1b3f5d7c9' // placeholder; real hash set on first save
+};
+
+// On first load, set the real default hash
+(async()=>{
+  if(!localStorage.getItem('site_pwd_hash')){
+    CREDENTIALS.passwordHash = await sha256('sophrologie');
+  }
+})();
+
+// ══════════════════════════════════════════════════
+// SUPABASE — connexion et synchronisation
+// ══════════════════════════════════════════════════
+const SUPABASE_URL = 'https://czsabcuedgfeqtfakwni.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6c2FiY3VlZGdmZXF0ZmFrd25pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMDYzMDcsImV4cCI6MjA5Mjc4MjMwN30.3P-SB8VHZMfUD5zyfssaVOxQT8dG6CIHk_wIQpcQ4Nw';
+const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function syncToCloud(){
+  try{
+    const {error}=await sbClient.from('site_content').upsert({id:1,content:SD},{onConflict:'id'});
+    if(error){console.error('Supabase error:',error);toast('⚠ Erreur sauvegarde');}
+    else{toast('✓ Sauvegardé dans le Cloud !');}
+  }catch(e){console.error('syncToCloud:',e);toast('⚠ Erreur réseau');}
+}
+
+async function loadFromCloud(){
+  // ── Affichage immédiat avec les données par défaut ──
+  buildNav();
+  renderSoins();
+  renderTarifs();
+  rebuildCustom();
+  goPage('home');
+
+  // ── Chargement Supabase en arrière-plan ──
+  try{
+    const {data,error}=await sbClient.from('site_content').select('content').eq('id',1).maybeSingle();
+    if(!error && data && data.content){
+      SD=Object.assign({},SD,data.content);
+      console.log('✓ Données cloud chargées');
+      // Mise à jour silencieuse de l'affichage avec les données cloud
+      buildNav();
+      renderSoins();
+      renderTarifs();
+      rebuildCustom();
+      // Remet la page home active (rebuildCustom peut changer la page active)
+      goPage('home');
+    }else{
+      console.log('Pas de données cloud, valeurs par défaut conservées');
+    }
+  }catch(e){
+    console.warn('loadFromCloud échoué, valeurs par défaut conservées:',e);
+  }
+}
+
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+let SD = {
+  // Nav labels for fixed pages (user can rename)
+  navLabels:{home:'Accueil',about:'À propos',soins:'Soins',tarifs:'Tarifs',contact:'Rendez-vous'},
+  navVisible:{home:true,about:true,soins:true,tarifs:true,contact:true},
+
+  hero:{title:'Retrouvez votre <em>équilibre intérieur</em>',desc:'La sophrologie est un voyage vers soi. À travers des techniques douces de relaxation et de visualisation positive, je vous accompagne vers un mieux-être durable.'},
+  about:{title:'Une approche <em>douce et personnalisée</em>',p1:'Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l\'écoute de chaque personne dans sa singularité.',p2:'Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.',sig:'— Marie Beaumont',photo:null},
+  soins:[
+    {id:1,icon:'🌬️',titre:'Gestion du stress',desc:'Libérez les tensions et retrouvez calme et sérénité grâce à des exercices de respiration et de détente musculaire.',tag:'Séance individuelle',photo:null},
+    {id:2,icon:'😴',titre:'Sommeil & récupération',desc:'Retrouvez un sommeil de qualité avec des techniques adaptées aux troubles du sommeil et à la fatigue chronique.',tag:'Programme 6 séances',photo:null},
+    {id:3,icon:'🤰',titre:'Maternité & naissance',desc:'Préparez votre accouchement sereinement avec la sophrologie périnatale. Un accompagnement doux pour vous et votre bébé.',tag:'Femmes enceintes',photo:null},
+    {id:4,icon:'🎯',titre:'Confiance en soi',desc:'Renforcez votre estime personnelle, surmontez vos blocages et développez vos ressources intérieures.',tag:'Développement personnel',photo:null},
+    {id:5,icon:'🏃',titre:'Performance sportive',desc:'Concentration, visualisation positive, gestion du trac avant une compétition. La sophrologie alliée des sportifs.',tag:'Préparation mentale',photo:null},
+    {id:6,icon:'🌸',titre:'Accompagnement enfants',desc:'Séances adaptées aux enfants et adolescents pour gérer le stress scolaire, les angoisses et renforcer la concentration.',tag:'Enfants & ados',photo:null}
+  ],
+  tarifs:[
+    {titre:'Découverte',prix:'65',duree:'60 min',features:['Bilan & objectifs','Première séance','Exercices à domicile'],featured:false},
+    {titre:'Suivi mensuel',prix:'220',duree:'4 séances/mois',features:['4 séances de 60 min','Suivi personnalisé','Audio relaxation offert','Support entre séances'],featured:true},
+    {titre:'Pack intensif',prix:'350',duree:'6 séances',features:['6 séances de 60 min','Bilan initial & final','Enregistrements audio'],featured:false}
+  ],
+  tarifs_sub:'Des formules adaptées à vos besoins. Remboursement possible par certaines mutuelles.',
+  contact:{title:'Je suis à votre écoute',adresse:'12 rue des Lilas, 75006 Paris',tel:'06 12 34 56 78',email:'contact@serena-sophrologie.fr',horaires:'Lun–Ven : 9h–19h · Sam : 9h–13h'},
+  customPages:[]
+};
+let soinIdC=10, pageIdC=100;
+
+// ══════════════════════════════════════════════════
+// NAVIGATION RENDERING
+// ══════════════════════════════════════════════════
+const FIXED_PAGES=['home','about','soins','tarifs','contact'];
+
+function buildNav(){
+  const nl=document.getElementById('navLinks');
+  nl.innerHTML='';
+  FIXED_PAGES.forEach(key=>{
+    if(!SD.navVisible[key])return;
+    const isCta=key==='contact';
+    const li=document.createElement('li');
+    li.innerHTML=`<a onclick="goPage('${key}')" id="nav-${key}" class="${isCta?'nav-cta':''}">${SD.navLabels[key]}</a>`;
+    nl.appendChild(li);
+  });
+  // custom pages
+  SD.customPages.forEach(p=>{
+    if(p.visible===false)return;
+    const li=document.createElement('li');
+    li.innerHTML=`<a onclick="goPage('cp-${p.id}')" id="nav-cp-${p.id}">${p.navTitle}</a>`;
+    li.classList.add('cpnav');
+    // insert before contact
+    const contactLi=nl.querySelector('#nav-contact')?.parentElement;
+    if(contactLi)nl.insertBefore(li,contactLi);else nl.appendChild(li);
+  });
+  buildFooter();
+  markActiveNav();
+}
+
+function buildFooter(){
+  const fl=document.getElementById('footerLinks');
+  fl.innerHTML='';
+  FIXED_PAGES.forEach(key=>{
+    if(!SD.navVisible[key])return;
+    const a=document.createElement('a');
+    a.textContent=SD.navLabels[key];a.onclick=()=>goPage(key);fl.appendChild(a);
+  });
+  SD.customPages.forEach(p=>{
+    if(p.visible===false)return;
+    const a=document.createElement('a');a.textContent=p.navTitle;a.onclick=()=>goPage('cp-'+p.id);fl.appendChild(a);
+  });
+  const adm=document.createElement('a');adm.textContent='⚙ Admin';adm.onclick=()=>goPage('admin');fl.appendChild(adm);
+}
+
+function markActiveNav(){
+  document.querySelectorAll('#navLinks a').forEach(a=>a.classList.remove('active'));
+  const cur=document.body.dataset.page;
+  const el=document.getElementById('nav-'+cur)||document.getElementById('nav-cp-'+cur.replace('cp-',''));
+  if(el)el.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════
+// PAGE ROUTING
+// ══════════════════════════════════════════════════
+function goPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el)el.classList.add('active');
+  document.body.dataset.page=page;
+  window.scrollTo(0,0);
+  document.getElementById('mainFooter').style.display=page==='admin'?'none':'block';
+  markActiveNav();
+  if(page==='admin')initAdmin();
+  if(page==='soins')renderSoins();
+  if(page==='tarifs')renderTarifs();
+}
+
+// ══════════════════════════════════════════════════
+// PUBLIC RENDERS
+// ══════════════════════════════════════════════════
+function renderSoins(){
+  document.getElementById('soins-container').innerHTML=SD.soins.map(s=>`
+    <div class="soin-card">
+      ${s.photo
+        ?`<img class="soin-img" src="${s.photo}" alt="${s.titre}">`
+        :`<div class="soin-placeholder">${s.icon}</div>`}
+      <div class="soin-body"><h3>${s.titre}</h3><p>${s.desc}</p><span class="soin-tag">${s.tag}</span></div>
+    </div>`).join('');
+}
+function renderTarifs(){
+  document.getElementById('tarifs-sub').textContent=SD.tarifs_sub;
+  document.getElementById('tarifs-container').innerHTML=SD.tarifs.map(t=>`
+    <div class="tarif-card ${t.featured?'featured':''}">
+      <h3>${t.titre}</h3><div class="tarif-prix"><sup>€</sup>${t.prix}</div>
+      <p class="tarif-duree">${t.duree}</p>
+      <ul class="tarif-features">${t.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <button class="btn-tarif" onclick="goPage('contact')">Réserver</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════
+// CUSTOM PAGES
+// ══════════════════════════════════════════════════
+function rebuildCustom(){
+  buildNav();
+  // DOM pages
+  const c=document.getElementById('custom-pages-container');c.innerHTML='';
+  SD.customPages.forEach(p=>{
+    const div=document.createElement('div');div.className='page';div.id='page-cp-'+p.id;
+    div.innerHTML=`<div class="custom-wrap"><div class="custom-inner">
+      ${p.photo?`<img class="custom-cover" src="${p.photo}" alt="">`:''}
+      ${p.sub?`<span class="section-tag">${p.sub}</span>`:''}
+      <h1>${p.heading}</h1>
+      <div class="custom-body">${p.body||''}</div>
+    </div></div>`;
+    c.appendChild(div);
+  });
+  // admin sidebar
+  const sec=document.getElementById('custom-menu-section');sec.innerHTML='';
+  if(SD.customPages.length){
+    const t=document.createElement('div');t.className='msec';t.textContent='Pages perso';sec.appendChild(t);
+    SD.customPages.forEach(p=>{
+      const li=document.createElement('li');
+      li.innerHTML=`<a onclick="showPanel('p-cp-${p.id}')" id="m-cp-${p.id}">📄 ${p.navTitle}</a>`;
+      sec.appendChild(li);
+    });
+  }
+  buildCustomAdminPanels();
+  updatePagesList();
+  buildCustomNavTable();
+}
+
+function buildCustomAdminPanels(){
+  const c=document.getElementById('custom-admin-panels');c.innerHTML='';
+  SD.customPages.forEach(p=>{
+    const d=document.createElement('div');d.className='admin-panel';d.id='p-cp-'+p.id;
+    d.innerHTML=`<h2>Page : ${p.navTitle}</h2>
+      <div class="acard">
+        <h4>${p.navTitle}
+          <div style="display:flex;gap:8px">
+            <button class="btn-sm" onclick="openEdit(${p.id})">✏️ Modifier</button>
+            <button class="btn-danger" onclick="confirmDel(${p.id})">🗑 Supprimer</button>
+          </div>
+        </h4>
+        <div style="background:var(--sand);padding:14px;border-radius:8px;font-size:14px;color:var(--text-light);white-space:pre-wrap;max-height:160px;overflow:auto;line-height:1.7">${p.body||'(vide)'}</div>
+        <div style="margin-top:14px"><button class="btn-primary" onclick="goPage('cp-${p.id}')">👁 Voir la page →</button></div>
+      </div>`;
+    c.appendChild(d);
+  });
+}
+
+function updatePagesList(){
+  const l=document.getElementById('pages-list');
+  if(!SD.customPages.length){l.innerHTML='<p style="color:var(--text-light);font-size:14px">Aucune page personnalisée pour l\'instant.</p>';return;}
+  l.innerHTML=SD.customPages.map(p=>`
+    <div class="page-list-item">
+      <div class="pli-info"><div class="name">${p.navTitle}</div><div class="slug">${p.heading}</div></div>
+      <div class="pli-actions">
+        <button class="btn-sm" onclick="openEdit(${p.id})">✏️ Modifier</button>
+        <button class="btn-danger" onclick="confirmDel(${p.id})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function createCustomPage(){
+  const nav=document.getElementById('np-nav').value.trim();
+  const head=document.getElementById('np-heading').value.trim();
+  if(!nav||!head){alert('Renseignez le libellé menu et le titre svp.');return;}
+  const id=++pageIdC;
+  const prev=document.getElementById('np-photo-prev');
+  SD.customPages.push({id,navTitle:nav,heading:head,sub:document.getElementById('np-sub').value.trim(),body:document.getElementById('np-body').value,photo:prev.classList.contains('show')?prev.src:null,visible:true});
+  ['np-nav','np-heading','np-sub','np-body'].forEach(i=>document.getElementById(i).value='');
+  prev.src='';prev.classList.remove('show');
+  rebuildCustom();syncToCloud();showPanel('p-cp-'+id);
+}
+
+function openEdit(id){
+  const p=SD.customPages.find(x=>x.id===id);if(!p)return;
+  document.getElementById('em-id').value=id;
+  document.getElementById('em-nav').value=p.navTitle;
+  document.getElementById('em-heading').value=p.heading;
+  document.getElementById('em-sub').value=p.sub||'';
+  document.getElementById('em-body').value=p.body||'';
+  const prev=document.getElementById('em-photo-prev');
+  if(p.photo){prev.src=p.photo;prev.classList.add('show');}else{prev.src='';prev.classList.remove('show');}
+  document.getElementById('editModal').classList.add('open');
+}
+function saveEditPage(){
+  const id=parseInt(document.getElementById('em-id').value);
+  const p=SD.customPages.find(x=>x.id===id);if(!p)return;
+  p.navTitle=document.getElementById('em-nav').value.trim();
+  p.heading=document.getElementById('em-heading').value.trim();
+  p.sub=document.getElementById('em-sub').value.trim();
+  p.body=document.getElementById('em-body').value;
+  const prev=document.getElementById('em-photo-prev');
+  p.photo=prev.classList.contains('show')?prev.src:null;
+  closeModal();rebuildCustom();syncToCloud();
+}
+function confirmDeletePage(){if(confirm('Supprimer cette page définitivement ?')){const id=parseInt(document.getElementById('em-id').value);closeModal();delPage(id);}}
+function confirmDel(id){if(confirm('Supprimer cette page définitivement ?'))delPage(id);}
+function delPage(id){SD.customPages=SD.customPages.filter(x=>x.id!==id);rebuildCustom();syncToCloud();showPanel('p-pages');toast();}
+function closeModal(){document.getElementById('editModal').classList.remove('open');}
+document.getElementById('editModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+// ══════════════════════════════════════════════════
+// NAV MANAGER — fixed pages titles & visibility
+// ══════════════════════════════════════════════════
+const FIXED_LABELS={home:'Accueil',about:'À propos',soins:'Soins',tarifs:'Tarifs',contact:'Rendez-vous (bouton menu)'};
+
+function buildFixedNavTable(){
+  const tbody=document.getElementById('fixed-nav-body');
+  tbody.innerHTML=FIXED_PAGES.map(key=>`
+    <tr class="fixed-row">
+      <td><strong style="font-size:13px">${FIXED_LABELS[key]}</strong></td>
+      <td><input type="text" id="nl-${key}" value="${SD.navLabels[key]}" style="width:100%"></td>
+      <td><span class="page-type">Fixe</span></td>
+      <td style="text-align:center">
+        <button class="toggle-vis" onclick="toggleFixed('${key}')" id="vis-${key}" title="Afficher / Masquer">
+          ${SD.navVisible[key]?'👁':'🙈'}
+        </button>
+      </td>
+    </tr>`).join('');
+}
+function toggleFixed(key){
+  if(key==='home'){alert('La page Accueil ne peut pas être masquée.');return;}
+  SD.navVisible[key]=!SD.navVisible[key];
+  document.getElementById('vis-'+key).textContent=SD.navVisible[key]?'👁':'🙈';
+  buildNav();
+}
+function saveNavTitles(){
+  FIXED_PAGES.forEach(key=>{
+    const el=document.getElementById('nl-'+key);
+    if(el)SD.navLabels[key]=el.value.trim()||SD.navLabels[key];
+  });
+  buildNav();toast();
+}
+function buildCustomNavTable(){
+  const card=document.getElementById('custom-nav-table-card');
+  const tbody=document.getElementById('custom-nav-body');
+  if(!SD.customPages.length){card.style.display='none';return;}
+  card.style.display='block';
+  tbody.innerHTML=SD.customPages.map(p=>`
+    <tr>
+      <td><strong style="font-size:13px">${p.heading}</strong></td>
+      <td><input type="text" id="cnl-${p.id}" value="${p.navTitle}" style="width:100%" onchange="updateCustomNavLabel(${p.id},this.value)"></td>
+      <td style="text-align:center"><button class="toggle-vis" onclick="toggleCustomVis(${p.id})" id="cvis-${p.id}">${p.visible!==false?'👁':'🙈'}</button></td>
+      <td><button class="btn-danger" style="font-size:11px;padding:4px 10px" onclick="confirmDel(${p.id})">🗑</button></td>
+    </tr>`).join('');
+}
+function toggleCustomVis(id){
+  const p=SD.customPages.find(x=>x.id===id);if(!p)return;
+  p.visible=!(p.visible!==false);
+  document.getElementById('cvis-'+id).textContent=p.visible?'👁':'🙈';
+  buildNav();
+}
+function updateCustomNavLabel(id,val){
+  const p=SD.customPages.find(x=>x.id===id);if(p)p.navTitle=val;buildNav();
+}
+
+// ══════════════════════════════════════════════════
+// ADMIN LOGIN / LOGOUT
+// ══════════════════════════════════════════════════
+let isLoggedIn=false;
+
+async function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const hash=await sha256(p);
+  const errEl=document.getElementById('loginError');
+  if(u===CREDENTIALS.username && hash===CREDENTIALS.passwordHash){
+    isLoggedIn=true;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminDash').classList.add('active');
+    document.getElementById('loginUser').value='';
+    document.getElementById('loginPass').value='';
+    errEl.style.display='none';
+    loadAdminFields();
+  } else {
+    errEl.style.display='block';
+    document.getElementById('loginPass').value='';
+  }
+}
+function doLogout(){
+  isLoggedIn=false;
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('adminDash').classList.remove('active');
+  goPage('home');
+}
+function initAdmin(){
+  if(isLoggedIn){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminDash').classList.add('active');
+    loadAdminFields();
+  }
+}
+
+// ══════════════════════════════════════════════════
+// PASSWORD CHANGE
+// ══════════════════════════════════════════════════
+function checkPwdStrength(val){
+  const bar=document.getElementById('pwd-bar');
+  const hint=document.getElementById('pwd-hint');
+  let score=0;
+  if(val.length>=8)score++;if(val.length>=12)score++;
+  if(/[A-Z]/.test(val))score++;if(/[0-9]/.test(val))score++;if(/[^A-Za-z0-9]/.test(val))score++;
+  const colors=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#27ae60'];
+  const labels=['Très faible','Faible','Moyen','Fort','Très fort'];
+  bar.style.width=(score*20)+'%';bar.style.background=colors[score-1]||'#eee';
+  hint.textContent=val.length?labels[score-1]||'':'';
+}
+async function changePassword(){
+  const curr=document.getElementById('pwd-current').value;
+  const nw=document.getElementById('pwd-new').value;
+  const conf=document.getElementById('pwd-confirm').value;
+  const msg=document.getElementById('pwd-msg');
+  if(!curr||!nw||!conf){msg.textContent='Remplissez tous les champs.';msg.style.color='var(--danger)';return;}
+  if(nw.length<8){msg.textContent='8 caractères minimum.';msg.style.color='var(--danger)';return;}
+  if(nw!==conf){msg.textContent='Les mots de passe ne correspondent pas.';msg.style.color='var(--danger)';return;}
+  const currHash=await sha256(curr);
+  if(currHash!==CREDENTIALS.passwordHash){msg.textContent='Mot de passe actuel incorrect.';msg.style.color='var(--danger)';return;}
+  const newHash=await sha256(nw);
+  CREDENTIALS.passwordHash=newHash;
+  localStorage.setItem('site_pwd_hash',newHash);
+  msg.textContent='✓ Mot de passe mis à jour !';msg.style.color='var(--sage-dark)';
+  ['pwd-current','pwd-new','pwd-confirm'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pwd-bar').style.width='0';document.getElementById('pwd-hint').textContent='';
+}
+async function changeUsername(){
+  const nu=document.getElementById('new-username').value.trim();
+  if(!nu){return;}
+  CREDENTIALS.username=nu;localStorage.setItem('site_username',nu);
+  document.getElementById('current-username-display').textContent=nu;
+  document.getElementById('new-username').value='';
+  toast();
+}
+
+// ══════════════════════════════════════════════════
+// LOAD ADMIN FIELDS
+// ══════════════════════════════════════════════════
+function loadAdminFields(){
+  document.getElementById('a-hero-title').value=SD.hero.title;
+  document.getElementById('a-hero-desc').value=SD.hero.desc;
+  document.getElementById('a-about-title').value=SD.about.title;
+  document.getElementById('a-about-p1').value=SD.about.p1;
+  document.getElementById('a-about-p2').value=SD.about.p2;
+  document.getElementById('a-about-sig').value=SD.about.sig;
+  if(SD.about.photo){const p=document.getElementById('about-photo-prev');p.src=SD.about.photo;p.classList.add('show');document.getElementById('about-photo-rm').style.display='inline-block';}
+  document.getElementById('a-tarifs-sub').value=SD.tarifs_sub;
+  document.getElementById('a-ct-title').value=SD.contact.title;
+  document.getElementById('a-ct-adresse').value=SD.contact.adresse;
+  document.getElementById('a-ct-tel').value=SD.contact.tel;
+  document.getElementById('a-ct-email').value=SD.contact.email;
+  document.getElementById('a-ct-horaires').value=SD.contact.horaires;
+  document.getElementById('current-username-display').textContent=CREDENTIALS.username;
+  buildSoinsAdmin();buildTarifsAdmin();buildFixedNavTable();buildCustomNavTable();
+  buildCustomAdminPanels();updatePagesList();
+}
+
+function showPanel(id){
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
+  document.querySelectorAll('.admin-menu a').forEach(a=>a.classList.remove('active'));
+  const key=id.replace('p-','');
+  const m=document.getElementById('m-'+key);if(m)m.classList.add('active');
+}
+function toast(msg='✓ Modifications enregistrées !'){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+  setTimeout(()=>t.style.display='none',2500);
+}
+
+// ══════════════════════════════════════════════════
+// PHOTO HELPER
+// ══════════════════════════════════════════════════
+function handlePhoto(input,previewId,callback){
+  if(!input.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const prev=document.getElementById(previewId);
+    prev.src=e.target.result;prev.classList.add('show');
+    if(callback)callback(e.target.result);
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+// ══════════════════════════════════════════════════
+// SOINS ADMIN
+// ══════════════════════════════════════════════════
+function buildSoinsAdmin(){
+  document.getElementById('soins-admin-list').innerHTML=SD.soins.map(s=>buildSoinCard(s)).join('');
+}
+function buildSoinCard(s){
+  const hasPhoto=!!s.photo;
+  return `<div class="sac" id="sac-${s.id}">
+    <div class="sac-head" onclick="toggleSoin(${s.id})">
+      ${hasPhoto
+        ?`<img class="sac-thumb" src="${s.photo}" alt="">`
+        :`<div class="sac-emoji">${s.icon}</div>`}
+      <span class="sac-label" id="sl-${s.id}">${s.titre}</span>
+      <button class="sac-toggle" id="st-${s.id}">▾</button>
+      <button class="btn-danger" style="font-size:11px;padding:5px 10px" onclick="event.stopPropagation();removeSoin(${s.id})">✕</button>
+    </div>
+    <div class="sac-body" id="sb-${s.id}">
+      <div class="row2">
+        <div class="af"><label>Titre</label><input type="text" id="s-t-${s.id}" value="${s.titre}" oninput="document.getElementById('sl-${s.id}').textContent=this.value"></div>
+        <div class="af"><label>Emoji (si pas de photo)</label><input type="text" id="s-i-${s.id}" value="${s.icon}"></div>
+      </div>
+      <div class="af"><label>Description</label><textarea id="s-d-${s.id}">${s.desc}</textarea></div>
+      <div class="af"><label>Tag / Catégorie</label><input type="text" id="s-g-${s.id}" value="${s.tag}"></div>
+      <div class="af">
+        <label>📷 Photo du soin (remplace l'emoji en haut de la carte)</label>
+        <div class="upload-zone">
+          <input type="file" id="s-ph-${s.id}" accept="image/*" onchange="setSoinPhoto(this,${s.id})">
+          <p class="upload-lbl">📷 Uploader une photo</p>
+          <img id="s-pv-${s.id}" class="upload-preview ${hasPhoto?'show':''}" src="${s.photo||''}" alt="">
+        </div>
+        ${hasPhoto?`<button class="remove-photo" onclick="clearSoinPhoto(${s.id})">✕ Retirer la photo</button>`:'<span id="no-photo-${s.id}"></span>'}
+      </div>
+    </div>
+  </div>`;
+}
+function toggleSoin(id){
+  const b=document.getElementById('sb-'+id),t=document.getElementById('st-'+id);
+  b.classList.toggle('collapsed');t.textContent=b.classList.contains('collapsed')?'▸':'▾';
+}
+function addSoin(){
+  const id=++soinIdC;
+  SD.soins.push({id,icon:'✨',titre:'Nouveau soin',desc:'Décrivez ce soin ici.',tag:'Séance individuelle',photo:null});
+  const list=document.getElementById('soins-admin-list');
+  const tmp=document.createElement('div');tmp.innerHTML=buildSoinCard(SD.soins[SD.soins.length-1]);
+  list.appendChild(tmp.firstElementChild);
+  list.lastElementChild.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function removeSoin(id){
+  if(!confirm('Supprimer ce soin ?'))return;
+  SD.soins=SD.soins.filter(s=>s.id!==id);
+  document.getElementById('sac-'+id)?.remove();
+  renderSoins();syncToCloud();toast();
+}
+function setSoinPhoto(input,id){
+  if(!input.files[0])return;
+  const r=new FileReader();r.onload=e=>{
+    const soin=SD.soins.find(s=>s.id===id);if(soin)soin.photo=e.target.result;
+    buildSoinsAdmin();// rebuild to show remove button & thumbnail
+  };r.readAsDataURL(input.files[0]);
+}
+function clearSoinPhoto(id){
+  const soin=SD.soins.find(s=>s.id===id);if(soin)soin.photo=null;buildSoinsAdmin();
+}
+function saveSoins(){
+  SD.soins.forEach(s=>{
+    const ti=document.getElementById('s-t-'+s.id);
+    const ic=document.getElementById('s-i-'+s.id);
+    const de=document.getElementById('s-d-'+s.id);
+    const ta=document.getElementById('s-g-'+s.id);
+    if(ti)s.titre=ti.value;if(ic)s.icon=ic.value;if(de)s.desc=de.value;if(ta)s.tag=ta.value;
+  });
+  renderSoins();syncToCloud();
+}
+
+// ══════════════════════════════════════════════════
+// TARIFS ADMIN
+// ══════════════════════════════════════════════════
+function buildTarifsAdmin(){
+  document.getElementById('tarifs-admin-list').innerHTML=SD.tarifs.map((t,i)=>`
+    <div class="acard">
+      <h4>Formule : ${t.titre} ${t.featured?'⭐':''}</h4>
+      <div class="row2">
+        <div class="af"><label>Titre</label><input type="text" id="tf-t-${i}" value="${t.titre}"></div>
+        <div class="af"><label>Prix (€)</label><input type="text" id="tf-p-${i}" value="${t.prix}"></div>
+      </div>
+      <div class="af"><label>Durée</label><input type="text" id="tf-d-${i}" value="${t.duree}"></div>
+      <div class="af"><label>Inclusions (une par ligne)</label><textarea id="tf-f-${i}">${t.features.join('\n')}</textarea></div>
+      <div class="af"><label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="tf-s-${i}" ${t.featured?'checked':''}> Mettre cette formule en avant (fond vert)</label></div>
+    </div>`).join('');
+}
+function saveTarifs(){
+  SD.tarifs_sub=document.getElementById('a-tarifs-sub').value;
+  SD.tarifs.forEach((t,i)=>{
+    t.titre=document.getElementById('tf-t-'+i).value;
+    t.prix=document.getElementById('tf-p-'+i).value;
+    t.duree=document.getElementById('tf-d-'+i).value;
+    t.features=document.getElementById('tf-f-'+i).value.split('\n').filter(f=>f.trim());
+    t.featured=document.getElementById('tf-s-'+i).checked;
+  });
+  renderTarifs();syncToCloud();
+}
+
+// ══════════════════════════════════════════════════
+// SAVE FIXED PAGES
+// ══════════════════════════════════════════════════
+function saveHero(){
+  SD.hero.title=document.getElementById('a-hero-title').value;
+  SD.hero.desc=document.getElementById('a-hero-desc').value;
+  document.getElementById('hero-title').innerHTML=SD.hero.title;
+  document.getElementById('hero-desc').textContent=SD.hero.desc;
+  syncToCloud();
+}
+function setAboutPhoto(src){
+  SD.about.photo=src;
+  const frame=document.getElementById('about-frame');
+  frame.innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
+  frame.style.fontSize='0';
+  document.getElementById('about-photo-rm').style.display='inline-block';
+}
+function clearAboutPhoto(){
+  SD.about.photo=null;
+  document.getElementById('about-frame').innerHTML='🌿';
+  document.getElementById('about-frame').style.fontSize='';
+  const p=document.getElementById('about-photo-prev');p.src='';p.classList.remove('show');
+  document.getElementById('about-photo-rm').style.display='none';
+}
+function saveAbout(){
+  SD.about.title=document.getElementById('a-about-title').value;
+  SD.about.p1=document.getElementById('a-about-p1').value;
+  SD.about.p2=document.getElementById('a-about-p2').value;
+  SD.about.sig=document.getElementById('a-about-sig').value;
+  document.getElementById('about-title').innerHTML=SD.about.title;
+  document.getElementById('about-p1').textContent=SD.about.p1;
+  document.getElementById('about-p2').textContent=SD.about.p2;
+  document.getElementById('about-sig').textContent=SD.about.sig;
+  syncToCloud();
+}
+function saveContact(){
+  const g=id=>document.getElementById(id).value;
+  SD.contact.title=g('a-ct-title');SD.contact.adresse=g('a-ct-adresse');SD.contact.tel=g('a-ct-tel');
+  SD.contact.email=g('a-ct-email');SD.contact.horaires=g('a-ct-horaires');
+  document.getElementById('contact-title').textContent=SD.contact.title;
+  document.getElementById('contact-adresse').textContent=SD.contact.adresse;
+  document.getElementById('contact-tel').textContent=SD.contact.tel;
+  document.getElementById('contact-email').textContent=SD.contact.email;
+  document.getElementById('contact-horaires').textContent=SD.contact.horaires;
+  syncToCloud();
+}
+
+// ══════════════════════════════════════════════════
+// INIT — chargement Supabase au démarrage
+// ══════════════════════════════════════════════════
+window.addEventListener('load', loadFromCloud);
+</script>
+</body>
+</html>
