@@ -263,7 +263,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
     <div class="about-grid">
       <div class="about-visual">
         <div class="about-img-frame" id="about-frame">🌿</div>
-        <div class="about-badge"><strong>10+</strong><span>Années d'expérience</span></div>
+        <div class="about-badge"><strong id="about-annees">10+</strong><span>Années d'expérience</span></div>
       </div>
       <div class="about-text">
         <span class="section-tag">Votre sophrologue</span>
@@ -318,11 +318,20 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <div class="contact-item"><div class="ci-icon">🕐</div><div class="ci-text"><strong>Horaires</strong><span id="contact-horaires">Lun–Ven : 9h–19h · Sam : 9h–13h</span></div></div>
       </div>
       <div class="contact-form">
-        <div class="fg"><label>Prénom et nom</label><input type="text" placeholder="Marie Dupont"></div>
-        <div class="fg"><label>Email</label><input type="email" placeholder="marie@email.com"></div>
-        <div class="fg"><label>Objet</label><select><option>Première consultation</option><option>Suivi sophrologie</option><option>Renseignements</option></select></div>
-        <div class="fg"><label>Message</label><textarea placeholder="Dites-moi comment je peux vous aider…"></textarea></div>
-        <button class="btn-primary" style="width:100%;justify-content:center">Envoyer →</button>
+        <form id="contactForm" action="https://formspree.io/f/xbdqeqyy" method="POST" onsubmit="submitForm(event)">
+          <div class="fg"><label>Prénom et nom</label><input type="text" name="name" placeholder="Marie Dupont" required></div>
+          <div class="fg"><label>Email</label><input type="email" name="email" placeholder="marie@email.com" required></div>
+          <div class="fg"><label>Objet</label>
+            <select name="objet">
+              <option>Première consultation</option>
+              <option>Suivi sophrologie</option>
+              <option>Renseignements</option>
+            </select>
+          </div>
+          <div class="fg"><label>Message</label><textarea name="message" placeholder="Dites-moi comment je peux vous aider…" required></textarea></div>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center" id="form-btn">Envoyer →</button>
+          <p id="form-msg" style="margin-top:12px;font-size:14px;text-align:center;display:none"></p>
+        </form>
       </div>
     </div>
   </section>
@@ -397,6 +406,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
             <div class="af"><label>Paragraphe 2</label><textarea id="a-about-p2"></textarea></div>
           </div>
           <div class="af"><label>Signature / Nom</label><input type="text" id="a-about-sig"></div>
+          <div class="af"><label>Années d'expérience (ex: 10+)</label><input type="text" id="a-about-annees" placeholder="10+"></div>
           <button class="btn-save" onclick="saveAbout()">✓ Enregistrer</button>
         </div>
       </div>
@@ -417,7 +427,8 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
           <div class="af"><label>Sous-titre</label><input type="text" id="a-tarifs-sub"></div>
         </div>
         <div id="tarifs-admin-list"></div>
-        <button class="btn-save" onclick="saveTarifs()">✓ Enregistrer</button>
+        <button class="btn-add" onclick="addTarif()" style="margin-top:4px">＋ Ajouter une formule</button>
+        <div style="margin-top:14px"><button class="btn-save" onclick="saveTarifs()">✓ Enregistrer tous les tarifs</button></div>
       </div>
 
       <!-- PANEL CONTACT -->
@@ -630,7 +641,7 @@ let SD = {
   navVisible:{home:true,about:true,soins:true,tarifs:true,contact:true},
 
   hero:{title:'Retrouvez votre <em>équilibre intérieur</em>',desc:'La sophrologie est un voyage vers soi. À travers des techniques douces de relaxation et de visualisation positive, je vous accompagne vers un mieux-être durable.'},
-  about:{title:'Une approche <em>douce et personnalisée</em>',p1:'Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l\'écoute de chaque personne dans sa singularité.',p2:'Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.',sig:'— Marie Beaumont',photo:null},
+  about:{title:'Une approche <em>douce et personnalisée</em>',p1:'Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l\'écoute de chaque personne dans sa singularité.',p2:'Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.',sig:'— Marie Beaumont',annees:'10+',photo:null},
   soins:[
     {id:1,icon:'🌬️',titre:'Gestion du stress',desc:'Libérez les tensions et retrouvez calme et sérénité grâce à des exercices de respiration et de détente musculaire.',tag:'Séance individuelle',photo:null},
     {id:2,icon:'😴',titre:'Sommeil & récupération',desc:'Retrouvez un sommeil de qualité avec des techniques adaptées aux troubles du sommeil et à la fatigue chronique.',tag:'Programme 6 séances',photo:null},
@@ -648,7 +659,7 @@ let SD = {
   contact:{title:'Je suis à votre écoute',adresse:'12 rue des Lilas, 75006 Paris',tel:'06 12 34 56 78',email:'contact@serena-sophrologie.fr',horaires:'Lun–Ven : 9h–19h · Sam : 9h–13h'},
   customPages:[]
 };
-let soinIdC=10, pageIdC=100;
+let soinIdC=10, pageIdC=100, tarifIdC=10;
 
 // ══════════════════════════════════════════════════
 // NAVIGATION RENDERING
@@ -691,7 +702,7 @@ function buildFooter(){
     if(p.visible===false)return;
     const a=document.createElement('a');a.textContent=p.navTitle;a.onclick=()=>goPage('cp-'+p.id);fl.appendChild(a);
   });
-  const adm=document.createElement('a');adm.textContent='⚙ Admin';adm.onclick=()=>goPage('admin');fl.appendChild(adm);
+  const adm=document.createElement('a');adm.textContent='·';adm.title='';adm.onclick=()=>goPage('admin');adm.style.cssText='opacity:0.15;font-size:18px;cursor:default;user-select:none;';adm.onmouseover=()=>adm.style.opacity='0.4';adm.onmouseout=()=>adm.style.opacity='0.15';fl.appendChild(adm);
 }
 
 function markActiveNav(){
@@ -986,6 +997,7 @@ function loadAdminFields(){
   document.getElementById('a-about-p1').value=SD.about.p1;
   document.getElementById('a-about-p2').value=SD.about.p2;
   document.getElementById('a-about-sig').value=SD.about.sig;
+  document.getElementById('a-about-annees').value=SD.about.annees||'10+';
   if(SD.about.photo){const p=document.getElementById('about-photo-prev');p.src=SD.about.photo;p.classList.add('show');document.getElementById('about-photo-rm').style.display='inline-block';}
   document.getElementById('a-tarifs-sub').value=SD.tarifs_sub;
   document.getElementById('a-ct-title').value=SD.contact.title;
@@ -1103,26 +1115,50 @@ function saveSoins(){
 // TARIFS ADMIN
 // ══════════════════════════════════════════════════
 function buildTarifsAdmin(){
-  document.getElementById('tarifs-admin-list').innerHTML=SD.tarifs.map((t,i)=>`
-    <div class="acard">
-      <h4>Formule : ${t.titre} ${t.featured?'⭐':''}</h4>
+  // Ensure each tarif has a stable id
+  SD.tarifs.forEach((t,i)=>{ if(!t.id) t.id = ++tarifIdC; });
+  document.getElementById('tarifs-admin-list').innerHTML=SD.tarifs.map(t=>`
+    <div class="acard" id="tac-${t.id}">
+      <h4>
+        <span>${t.titre} ${t.featured?'⭐':''}</span>
+        <button class="btn-danger" style="font-size:11px;padding:5px 10px" onclick="removeTarif(${t.id})">✕ Supprimer</button>
+      </h4>
       <div class="row2">
-        <div class="af"><label>Titre</label><input type="text" id="tf-t-${i}" value="${t.titre}"></div>
-        <div class="af"><label>Prix (€)</label><input type="text" id="tf-p-${i}" value="${t.prix}"></div>
+        <div class="af"><label>Titre</label><input type="text" id="tf-t-${t.id}" value="${t.titre}"></div>
+        <div class="af"><label>Prix (€)</label><input type="text" id="tf-p-${t.id}" value="${t.prix}"></div>
       </div>
-      <div class="af"><label>Durée</label><input type="text" id="tf-d-${i}" value="${t.duree}"></div>
-      <div class="af"><label>Inclusions (une par ligne)</label><textarea id="tf-f-${i}">${t.features.join('\n')}</textarea></div>
-      <div class="af"><label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="tf-s-${i}" ${t.featured?'checked':''}> Mettre cette formule en avant (fond vert)</label></div>
+      <div class="af"><label>Durée</label><input type="text" id="tf-d-${t.id}" value="${t.duree}"></div>
+      <div class="af"><label>Inclusions (une par ligne)</label><textarea id="tf-f-${t.id}">${t.features.join('\n')}</textarea></div>
+      <div class="af"><label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="tf-s-${t.id}" ${t.featured?'checked':''}> Mettre en avant (fond vert)</label></div>
     </div>`).join('');
+}
+function addTarif(){
+  const id=++tarifIdC;
+  SD.tarifs.push({id,titre:'Nouvelle formule',prix:'0',duree:'60 min',features:['Inclure ici'],featured:false});
+  buildTarifsAdmin();
+  document.getElementById('tac-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function removeTarif(id){
+  if(!confirm('Supprimer cette formule ?'))return;
+  SD.tarifs=SD.tarifs.filter(t=>t.id!==id);
+  buildTarifsAdmin();
+  renderTarifs();
+  syncToCloud();
+  toast();
 }
 function saveTarifs(){
   SD.tarifs_sub=document.getElementById('a-tarifs-sub').value;
-  SD.tarifs.forEach((t,i)=>{
-    t.titre=document.getElementById('tf-t-'+i).value;
-    t.prix=document.getElementById('tf-p-'+i).value;
-    t.duree=document.getElementById('tf-d-'+i).value;
-    t.features=document.getElementById('tf-f-'+i).value.split('\n').filter(f=>f.trim());
-    t.featured=document.getElementById('tf-s-'+i).checked;
+  SD.tarifs.forEach(t=>{
+    const ti=document.getElementById('tf-t-'+t.id);
+    const pr=document.getElementById('tf-p-'+t.id);
+    const du=document.getElementById('tf-d-'+t.id);
+    const fe=document.getElementById('tf-f-'+t.id);
+    const st=document.getElementById('tf-s-'+t.id);
+    if(ti)t.titre=ti.value;
+    if(pr)t.prix=pr.value;
+    if(du)t.duree=du.value;
+    if(fe)t.features=fe.value.split('\n').filter(f=>f.trim());
+    if(st)t.featured=st.checked;
   });
   renderTarifs();syncToCloud();
 }
@@ -1156,10 +1192,12 @@ function saveAbout(){
   SD.about.p1=document.getElementById('a-about-p1').value;
   SD.about.p2=document.getElementById('a-about-p2').value;
   SD.about.sig=document.getElementById('a-about-sig').value;
+  SD.about.annees=document.getElementById('a-about-annees').value||'10+';
   document.getElementById('about-title').innerHTML=SD.about.title;
   document.getElementById('about-p1').textContent=SD.about.p1;
   document.getElementById('about-p2').textContent=SD.about.p2;
   document.getElementById('about-sig').textContent=SD.about.sig;
+  document.getElementById('about-annees').textContent=SD.about.annees;
   syncToCloud();
 }
 function saveContact(){
@@ -1172,6 +1210,35 @@ function saveContact(){
   document.getElementById('contact-email').textContent=SD.contact.email;
   document.getElementById('contact-horaires').textContent=SD.contact.horaires;
   syncToCloud();
+}
+
+
+// ══════════════════════════════════════════════════
+// FORMSPREE — envoi formulaire contact
+// ══════════════════════════════════════════════════
+async function submitForm(e){
+  e.preventDefault();
+  const btn=document.getElementById('form-btn');
+  const msg=document.getElementById('form-msg');
+  btn.textContent='Envoi en cours…';btn.disabled=true;
+  try{
+    const res=await fetch('https://formspree.io/f/xbdqeqyy',{
+      method:'POST',
+      body:new FormData(e.target),
+      headers:{Accept:'application/json'}
+    });
+    if(res.ok){
+      msg.textContent='✓ Message envoyé ! Je vous répondrai dans les meilleurs délais.';
+      msg.style.color='var(--sage-dark)';msg.style.display='block';
+      e.target.reset();btn.textContent='Envoyer →';btn.disabled=false;
+    }else{
+      throw new Error('Erreur serveur');
+    }
+  }catch(err){
+    msg.textContent='⚠ Erreur lors de l'envoi. Veuillez réessayer ou me contacter par téléphone.';
+    msg.style.color='var(--danger)';msg.style.display='block';
+    btn.textContent='Envoyer →';btn.disabled=false;
+  }
 }
 
 // ══════════════════════════════════════════════════
