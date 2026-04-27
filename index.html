@@ -1241,7 +1241,7 @@ async function submitForm(e){
       throw new Error('Erreur serveur');
     }
   }catch(err){
-    msg.textContent='⚠ Erreur lors de l'envoi. Veuillez réessayer ou me contacter par téléphone.';
+    msg.textContent="⚠ Erreur lors de l'envoi. Veuillez réessayer ou me contacter par téléphone.";
     msg.style.color='var(--danger)';msg.style.display='block';
     btn.textContent='Envoyer →';btn.disabled=false;
   }
