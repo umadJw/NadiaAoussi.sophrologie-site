@@ -615,14 +615,20 @@ async function loadFromCloud(){
   try{
     const {data,error}=await sbClient.from('site_content').select('content').eq('id',1).maybeSingle();
     if(!error && data && data.content){
-      SD=Object.assign({},SD,data.content);
+      const cloud=data.content;
+      // Merge sécurisé : navVisible et navLabels ont toujours toutes les clés fixes
+      const safeVis={home:true,about:true,soins:true,tarifs:true,contact:true};
+      if(cloud.navVisible)Object.assign(safeVis,cloud.navVisible);
+      const safeLbl={home:'Accueil',about:'À propos',soins:'Soins',tarifs:'Tarifs',contact:'Rendez-vous'};
+      if(cloud.navLabels)Object.assign(safeLbl,cloud.navLabels);
+      SD=Object.assign({},SD,cloud);
+      SD.navVisible=safeVis;
+      SD.navLabels=safeLbl;
       console.log('✓ Données cloud chargées');
-      // Mise à jour silencieuse de l'affichage avec les données cloud
       buildNav();
       renderSoins();
       renderTarifs();
       rebuildCustom();
-      // Remet la page home active (rebuildCustom peut changer la page active)
       goPage('home');
     }else{
       console.log('Pas de données cloud, valeurs par défaut conservées');
@@ -702,7 +708,7 @@ function buildFooter(){
     if(p.visible===false)return;
     const a=document.createElement('a');a.textContent=p.navTitle;a.onclick=()=>goPage('cp-'+p.id);fl.appendChild(a);
   });
-  const adm=document.createElement('a');adm.textContent='·';adm.title='';adm.onclick=()=>goPage('admin');adm.style.cssText='opacity:0.15;font-size:18px;cursor:default;user-select:none;';adm.onmouseover=()=>adm.style.opacity='0.4';adm.onmouseout=()=>adm.style.opacity='0.15';fl.appendChild(adm);
+  const adm=document.createElement('a');adm.textContent='⚙ Admin';adm.onclick=()=>goPage('admin');fl.appendChild(adm);
 }
 
 function markActiveNav(){
