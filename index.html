@@ -263,7 +263,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
     <div class="about-grid">
       <div class="about-visual">
         <div class="about-img-frame" id="about-frame">🌿</div>
-        <div class="about-badge"><strong id="about-annees">10+</strong><span>Années d'expérience</span></div>
+        <div class="about-badge" id="about-badge"><strong id="about-annees">10+</strong><span>Années d'expérience</span></div>
       </div>
       <div class="about-text">
         <span class="section-tag">Votre sophrologue</span>
@@ -407,6 +407,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
           </div>
           <div class="af"><label>Signature / Nom</label><input type="text" id="a-about-sig"></div>
           <div class="af"><label>Années d'expérience (ex: 10+)</label><input type="text" id="a-about-annees" placeholder="10+"></div>
+          <div class="af"><label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" id="a-about-annees-vis"> Afficher le badge "Années d'expérience" sur la page</label></div>
           <button class="btn-save" onclick="saveAbout()">✓ Enregistrer</button>
         </div>
       </div>
@@ -786,7 +787,7 @@ let SD = {
   navLabels:{home:'Accueil',about:'À propos',soins:'Soins',tarifs:'Tarifs',contact:'Rendez-vous'},
   navVisible:{home:true,about:true,soins:true,tarifs:true,contact:true},
   hero:{title:'Retrouvez votre <em>équilibre intérieur</em>',desc:'La sophrologie est un voyage vers soi. À travers des techniques douces de relaxation et de visualisation positive, je vous accompagne vers un mieux-être durable.'},
-  about:{title:'Une approche <em>douce et personnalisée</em>',p1:"Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l'écoute de chaque personne dans sa singularité.",p2:"Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.",sig:'— Nadia Aoussi',annees:'10+',photo:null},
+  about:{title:'Une approche <em>douce et personnalisée</em>',p1:"Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l'écoute de chaque personne dans sa singularité.",p2:"Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.",sig:'— Nadia Aoussi',annees:'10+',anneesVisible:true,photo:null},
   soins:[
     {id:1,icon:'🌬️',titre:'Gestion du stress',desc:'Libérez les tensions et retrouvez calme et sérénité grâce à des exercices de respiration et de détente musculaire.',tag:'Séance individuelle',photo:null},
     {id:2,icon:'😴',titre:'Sommeil & récupération',desc:'Retrouvez un sommeil de qualité avec des techniques adaptées aux troubles du sommeil et à la fatigue chronique.',tag:'Programme 6 séances',photo:null},
@@ -1016,6 +1017,7 @@ function loadAdminFields(){
   document.getElementById('a-about-p2').value=SD.about.p2;
   document.getElementById('a-about-sig').value=SD.about.sig;
   document.getElementById('a-about-annees').value=SD.about.annees||'10+';
+  document.getElementById('a-about-annees-vis').checked=SD.about.anneesVisible!==false;
   if(SD.about.photo){const p=document.getElementById('about-photo-prev');p.src=SD.about.photo;p.classList.add('show');document.getElementById('about-photo-rm').style.display='inline-block';}
   document.getElementById('a-tarifs-sub').value=SD.tarifs_sub;
   document.getElementById('a-ct-title').value=SD.contact.title;
@@ -1164,6 +1166,8 @@ function saveAbout(){
   SD.about.p2=document.getElementById('a-about-p2').value;
   SD.about.sig=document.getElementById('a-about-sig').value;
   SD.about.annees=document.getElementById('a-about-annees').value||'10+';
+  SD.about.anneesVisible=document.getElementById('a-about-annees-vis').checked;
+  document.getElementById('about-badge').style.display=SD.about.anneesVisible?'block':'none';
   document.getElementById('about-title').innerHTML=SD.about.title;
   document.getElementById('about-p1').textContent=SD.about.p1;
   document.getElementById('about-p2').textContent=SD.about.p2;
