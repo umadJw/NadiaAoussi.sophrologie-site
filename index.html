@@ -131,6 +131,9 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 #footerLinks{display:flex;justify-content:center;gap:24px;margin-bottom:20px;flex-wrap:wrap;}
 #footerLinks a{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:color .3s;}
 #footerLinks a:hover{color:var(--sage-light);}
+/* Lien admin dans footer : quasi invisible */
+#footerLinks .admin-link{color:rgba(255,255,255,.08);font-size:10px;letter-spacing:0;}
+#footerLinks .admin-link:hover{color:rgba(255,255,255,.3);}
 .footer-copy{font-size:12px;color:rgba(255,255,255,.25);}
 
 /* ── ADMIN ── */
@@ -218,6 +221,10 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 .modal-box>h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
 .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light);}
 
+/* Bannière de chargement */
+.loading-banner{position:fixed;top:0;left:0;right:0;background:var(--sage-dark);color:#fff;text-align:center;padding:10px;font-size:13px;z-index:9999;letter-spacing:.05em;transition:opacity .5s;}
+.loading-banner.hidden{opacity:0;pointer-events:none;}
+
 @media(max-width:768px){
   nav{padding:16px 20px;}#navLinks{display:none;}
   section{padding:60px 22px;}.hero{padding:100px 22px 60px;}
@@ -230,42 +237,16 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- ═══ SECURITY HEADERS ═══ -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline'
-    https://cdn.jsdelivr.net
-    https://unpkg.com
-    https://fonts.googleapis.com;
-  style-src 'self' 'unsafe-inline'
-    https://fonts.googleapis.com
-    https://fonts.gstatic.com;
-  font-src 'self'
-    https://fonts.gstatic.com;
-  img-src 'self' data: blob:
-    https://czsabcuedgfeqtfakwni.supabase.co
-    https://*.supabase.co;
-  connect-src 'self'
-    https://czsabcuedgfeqtfakwni.supabase.co
-    https://formspree.io;
-  frame-ancestors 'none';
-  base-uri 'self';
-  form-action 'self' https://formspree.io;
-">
 </head>
 <body>
+
+<!-- Bannière chargement -->
+<div class="loading-banner" id="loadingBanner">🌿 Chargement du site…</div>
 
 <!-- ═══ NAV ═══ -->
 <nav>
   <div class="nav-logo" onclick="goPage('home')">Nadia Aoussi <span>Sophrologie</span></div>
-  <ul id="navLinks">
-    <!-- Built dynamically -->
-  </ul>
+  <ul id="navLinks"></ul>
 </nav>
 
 <!-- ═══ PAGE ACCUEIL ═══ -->
@@ -297,7 +278,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <h2 id="about-title">Une approche <em>douce et personnalisée</em></h2>
         <p id="about-p1">Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l'écoute de chaque personne dans sa singularité.</p>
         <p id="about-p2">Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.</p>
-        <div class="about-signature" id="about-sig">— Marie Beaumont</div>
+        <div class="about-signature" id="about-sig">— Nadia Aoussi</div>
       </div>
     </div>
   </section>
@@ -341,7 +322,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <h3 id="contact-title">Je suis à votre écoute</h3>
         <div class="contact-item"><div class="ci-icon">📍</div><div class="ci-text"><strong>Cabinet</strong><span id="contact-adresse">12 rue des Lilas, 75006 Paris</span></div></div>
         <div class="contact-item"><div class="ci-icon">📞</div><div class="ci-text"><strong>Téléphone</strong><span id="contact-tel">06 12 34 56 78</span></div></div>
-        <div class="contact-item"><div class="ci-icon">✉️</div><div class="ci-text"><strong>Email</strong><span id="contact-email">contact@serena-sophrologie.fr</span></div></div>
+        <div class="contact-item"><div class="ci-icon">✉️</div><div class="ci-text"><strong>Email</strong><span id="contact-email">contact@nadia-sophrologie.fr</span></div></div>
         <div class="contact-item"><div class="ci-icon">🕐</div><div class="ci-text"><strong>Horaires</strong><span id="contact-horaires">Lun–Ven : 9h–19h · Sam : 9h–13h</span></div></div>
       </div>
       <div class="contact-form">
@@ -364,7 +345,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
   </section>
 </div>
 
-<!-- ═══ CUSTOM PAGES (injected) ═══ -->
+<!-- ═══ CUSTOM PAGES (injectées dynamiquement) ═══ -->
 <div id="custom-pages-container"></div>
 
 <!-- ═══ PAGE ADMIN ═══ -->
@@ -376,8 +357,8 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
       <div style="font-size:40px;margin-bottom:12px">🌿</div>
       <h2>Espace Administration</h2>
       <p class="sub">Accès réservé</p>
-      <p class="login-error" id="loginError">Identifiants incorrects, réessayez.</p>
-      <input type="text" id="loginUser" placeholder="Identifiant" autocomplete="username">
+      <p class="login-error" id="loginError">Identifiants incorrects.</p>
+      <input type="email" id="loginUser" placeholder="Email" autocomplete="username">
       <input type="password" id="loginPass" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">Connexion →</button>
     </div>
@@ -396,7 +377,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <li><a onclick="showPanel('p-contact')" id="m-contact">📬 Contact</a></li>
         <div id="custom-menu-section"></div>
         <div class="msec">Gestion</div>
-        <li><a onclick="showPanel('p-nav')" id="m-nav">🧭 Gérer la navigation</a></li>
+        <li><a onclick="showPanel('p-nav')" id="m-nav">🧭 Navigation</a></li>
         <li><a onclick="showPanel('p-pages')" id="m-pages">➕ Nouvelles pages</a></li>
         <li><a onclick="showPanel('p-security')" id="m-security">🔐 Sécurité</a></li>
         <li style="margin-top:20px;border-top:1px solid #eee;padding-top:14px"><a onclick="doLogout()">🚪 Déconnexion</a></li>
@@ -420,7 +401,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <h2>Page À propos</h2>
         <div class="acard"><h4>Photo de profil</h4>
           <div class="upload-zone">
-            <input type="file" id="about-photo-file" accept="image/*" onchange="handlePhoto(this,'about-photo-prev',setAboutPhoto)">
+            <input type="file" id="about-photo-file" accept="image/*" onchange="setSinglePhoto(this,'about-photo-prev','about-profile',setAboutPhoto)">
             <p class="upload-lbl">📷 Cliquez pour uploader votre photo</p>
             <img id="about-photo-prev" class="upload-preview" src="" alt="">
           </div>
@@ -434,7 +415,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
           </div>
           <div class="af"><label>Signature / Nom</label><input type="text" id="a-about-sig"></div>
           <div class="af"><label>Années d'expérience (ex: 10+)</label><input type="text" id="a-about-annees" placeholder="10+"></div>
-          <div class="af"><label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" id="a-about-annees-vis"> Afficher le badge "Années d'expérience" sur la page</label></div>
+          <div class="af"><label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" id="a-about-annees-vis"> Afficher le badge "Années d'expérience"</label></div>
           <button class="btn-save" onclick="saveAbout()">✓ Enregistrer</button>
         </div>
       </div>
@@ -442,7 +423,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
       <!-- PANEL SOINS -->
       <div class="admin-panel" id="p-soins">
         <h2>Soins &amp; Accompagnements</h2>
-        <p style="font-size:13px;color:var(--text-light);margin-bottom:20px">Chaque soin peut avoir une <strong>photo</strong> à la place de l'emoji. Cliquez sur l'en-tête pour déplier/plier.</p>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:20px">Cliquez sur l'en-tête d'un soin pour le déplier.</p>
         <div id="soins-admin-list"></div>
         <button class="btn-add" onclick="addSoin()">＋ Ajouter un soin</button>
         <div style="margin-top:18px"><button class="btn-save" onclick="saveSoins()">✓ Enregistrer tous les soins</button></div>
@@ -476,12 +457,12 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         </div>
       </div>
 
-      <!-- PANEL NAVIGATION (gérer titres + visibilité) -->
+      <!-- PANEL NAVIGATION -->
       <div class="admin-panel" id="p-nav">
         <h2>Gérer la navigation</h2>
         <div class="acard">
-          <h4>Pages fixes — titres &amp; visibilité</h4>
-          <p style="font-size:13px;color:var(--text-light);margin-bottom:16px">Modifiez les libellés affichés dans le menu. Masquez ou affichez chaque page avec l'icône 👁.</p>
+          <h4>Pages fixes — libellés &amp; visibilité</h4>
+          <p style="font-size:13px;color:var(--text-light);margin-bottom:16px">Modifiez les libellés du menu. Cliquez sur 👁 pour masquer/afficher une page.</p>
           <table class="nav-table" id="fixed-nav-table">
             <thead><tr><th>Page</th><th>Libellé dans le menu</th><th>Type</th><th style="text-align:center">Visible</th></tr></thead>
             <tbody id="fixed-nav-body"></tbody>
@@ -528,8 +509,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <h2>Sécurité — Changer le mot de passe</h2>
         <div class="acard">
           <h4>Nouveau mot de passe</h4>
-          <p style="font-size:13px;color:var(--text-light);margin-bottom:18px">Le mot de passe est stocké de façon sécurisée (hashé SHA-256) dans votre navigateur. Il sera demandé à chaque connexion.</p>
-          <div class="af"><label>Mot de passe actuel</label><input type="password" id="pwd-current" placeholder="Entrez le mot de passe actuel"></div>
+          <p style="font-size:13px;color:var(--text-light);margin-bottom:18px">Le mot de passe est géré par Supabase Authentication (sécurisé côté serveur).</p>
           <div class="af"><label>Nouveau mot de passe</label>
             <input type="password" id="pwd-new" placeholder="Minimum 8 caractères" oninput="checkPwdStrength(this.value)">
             <div class="pwd-strength"><div class="pwd-bar" id="pwd-bar"></div></div>
@@ -541,14 +521,13 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
             <span id="pwd-msg" style="font-size:13px"></span>
           </div>
           <div style="margin-top:24px;padding-top:20px;border-top:1px solid #eee">
-            <p style="font-size:13px;color:var(--text-light);margin-bottom:10px"><strong>Identifiant actuel :</strong> <code id="current-username-display" style="background:var(--sand);padding:2px 8px;border-radius:4px"></code></p>
-            <div class="af"><label>Changer l'identifiant</label><input type="text" id="new-username" placeholder="Nouvel identifiant"></div>
-            <button class="btn-save" onclick="changeUsername()">✓ Changer l'identifiant</button>
+            <p style="font-size:13px;color:var(--text-light);margin-bottom:6px"><strong>Compte connecté :</strong></p>
+            <p style="font-size:14px;background:var(--sand);padding:10px 14px;border-radius:8px" id="current-username-display">—</p>
           </div>
         </div>
       </div>
 
-      <!-- CUSTOM PAGE ADMIN PANELS (injected) -->
+      <!-- CUSTOM PAGE ADMIN PANELS (injectés) -->
       <div id="custom-admin-panels"></div>
 
     </div><!-- /admin-content -->
@@ -562,7 +541,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
   <p class="footer-copy">© 2025 Nadia Aoussi Sophrologie · Tous droits réservés</p>
 </footer>
 
-<div class="toast" id="toast">✓ Modifications enregistrées !</div>
+<div class="toast" id="toast">✓ Enregistré !</div>
 
 <!-- MODAL EDIT CUSTOM PAGE -->
 <div class="modal-overlay" id="editModal">
@@ -591,46 +570,76 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 
 <script>
 'use strict';
-// ═══════════════════════════════════════════════════════════════
-//  SUPABASE — Authentification réelle + Stockage données + Photos
-//
-//  CE QUI A CHANGÉ (par rapport à l'ancienne version) :
-//  1. Login → supabase.auth.signInWithPassword (côté serveur, sécurisé)
-//  2. Photos → Supabase Storage (bucket "site-photos"), URL publique stockée
-//  3. syncToCloud() → upsert réel dans table "site_content"
-//  4. loadFromCloud() → chargement réel depuis Supabase
-//  5. RLS : voir instructions en bas de fichier
-// ═══════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════
+//  CONFIGURATION SUPABASE
+//  Ces clés sont publiques par conception (clé "anon").
+//  La sécurité réelle vient du RLS côté Supabase serveur.
+// ═══════════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://czsabcuedgfeqtfakwni.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6c2FiY3VlZGdmZXF0ZmFrd25pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMDYzMDcsImV4cCI6MjA5Mjc4MjMwN30.3P-SB8VHZMfUD5zyfssaVOxQT8dG6CIHk_wIQpcQ4Nw';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ─── SUPABASE AUTH — LOGIN / LOGOUT ───────────────────────────
-// Le mot de passe est vérifié côté serveur Supabase, pas dans le navigateur.
-// Pour créer votre compte admin : Supabase Dashboard → Authentication → Users → Add user
-// Email : votre email  |  Mot de passe : votre choix
-// NOTE : le champ "identifiant" affiché est l'email.
+// ─── ÉTAT GLOBAL ─────────────────────────────────────────
+let currentUser = null;
 
-let currentUser = null; // null = déconnecté, objet = connecté
+// ─── DONNÉES PAR DÉFAUT ───────────────────────────────────
+let SD = {
+  navLabels:  { home:'Accueil', about:'À propos', soins:'Soins', tarifs:'Tarifs', contact:'Rendez-vous' },
+  navVisible: { home:true, about:true, soins:true, tarifs:true, contact:true },
+  hero: {
+    title: 'Retrouvez votre <em>équilibre intérieur</em>',
+    desc:  'La sophrologie est un voyage vers soi. À travers des techniques douces de relaxation et de visualisation positive, je vous accompagne vers un mieux-être durable.'
+  },
+  about: {
+    title: 'Une approche <em>douce et personnalisée</em>',
+    p1:    "Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l'écoute de chaque personne dans sa singularité.",
+    p2:    "Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.",
+    sig:   '— Nadia Aoussi', annees: '10+', anneesVisible: true, photo: null
+  },
+  soins: [
+    { id:1, icon:'🌬️', titre:'Gestion du stress',      desc:"Libérez les tensions et retrouvez calme et sérénité grâce à des exercices de respiration et de détente musculaire.", tag:'Séance individuelle', photo:null },
+    { id:2, icon:'😴', titre:'Sommeil & récupération',  desc:"Retrouvez un sommeil de qualité avec des techniques adaptées aux troubles du sommeil et à la fatigue chronique.", tag:'Programme 6 séances', photo:null },
+    { id:3, icon:'🤰', titre:'Maternité & naissance',   desc:"Préparez votre accouchement sereinement avec la sophrologie périnatale. Un accompagnement doux pour vous et votre bébé.", tag:'Femmes enceintes', photo:null },
+    { id:4, icon:'🎯', titre:'Confiance en soi',        desc:"Renforcez votre estime personnelle, surmontez vos blocages et développez vos ressources intérieures.", tag:'Développement personnel', photo:null },
+    { id:5, icon:'🏃', titre:'Performance sportive',    desc:"Concentration, visualisation positive, gestion du trac avant une compétition.", tag:'Préparation mentale', photo:null },
+    { id:6, icon:'🌸', titre:'Accompagnement enfants',  desc:"Séances adaptées aux enfants et adolescents pour gérer le stress scolaire, les angoisses et renforcer la concentration.", tag:'Enfants & ados', photo:null }
+  ],
+  tarifs: [
+    { id:1, titre:'Découverte',    prix:'65',  duree:'60 min',        features:['Bilan & objectifs','Première séance','Exercices à domicile'], featured:false },
+    { id:2, titre:'Suivi mensuel', prix:'220', duree:'4 séances/mois', features:['4 séances de 60 min','Suivi personnalisé','Audio relaxation offert','Support entre séances'], featured:true },
+    { id:3, titre:'Pack intensif', prix:'350', duree:'6 séances',      features:['6 séances de 60 min','Bilan initial & final','Enregistrements audio'], featured:false }
+  ],
+  tarifs_sub: 'Des formules adaptées à vos besoins. Remboursement possible par certaines mutuelles.',
+  contact: { title:"Je suis à votre écoute", adresse:'12 rue des Lilas, 75006 Paris', tel:'06 12 34 56 78', email:'contact@nadia-sophrologie.fr', horaires:'Lun–Ven : 9h–19h · Sam : 9h–13h' },
+  customPages: []
+};
 
-async function doLogin(){
+let soinIdC = 10, pageIdC = 100, tarifIdC = 10;
+
+// ═══════════════════════════════════════════════════════════
+//  AUTHENTIFICATION SUPABASE
+// ═══════════════════════════════════════════════════════════
+
+async function doLogin() {
   const email = document.getElementById('loginUser').value.trim();
   const pass  = document.getElementById('loginPass').value;
   const errEl = document.getElementById('loginError');
   errEl.style.display = 'none';
 
-  if(!email || !pass){
+  if (!email || !pass) {
     errEl.textContent = 'Email et mot de passe requis.';
-    errEl.style.display = 'block'; return;
+    errEl.style.display = 'block';
+    return;
   }
 
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
 
-  if(error){
+  if (error) {
     errEl.textContent = 'Identifiants incorrects. Vérifiez votre email et mot de passe.';
     errEl.style.display = 'block';
-    document.getElementById('loginPass').value = ''; return;
+    document.getElementById('loginPass').value = '';
+    return;
   }
 
   currentUser = data.user;
@@ -640,317 +649,304 @@ async function doLogin(){
   document.getElementById('loginPass').value = '';
   document.getElementById('current-username-display').textContent = currentUser.email;
   loadAdminFields();
+  buildFooter(); // Affiche le lien admin discret dans le footer
 }
 
-async function doLogout(){
+async function doLogout() {
   await sb.auth.signOut();
   currentUser = null;
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('adminDash').classList.remove('active');
+  buildFooter(); // Retire le lien admin du footer
   goPage('home');
 }
 
-function initAdmin(){
-  // Vérifie si une session existe déjà (l'utilisateur avait gardé l'onglet ouvert)
-  if(currentUser){
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminDash').classList.add('active');
-    loadAdminFields();
+async function checkSession() {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    currentUser = data.session.user;
   }
 }
 
-// Rétablir la session au rechargement
-async function checkSession(){
-  const { data } = await sb.auth.getSession();
-  if(data.session){ currentUser = data.session.user; }
-}
-
-// ─── CHANGER MOT DE PASSE (via Supabase Auth) ─────────────────
-async function changePassword(){
+async function changePassword() {
   const nw   = document.getElementById('pwd-new').value;
   const conf = document.getElementById('pwd-confirm').value;
   const msg  = document.getElementById('pwd-msg');
-  if(!nw || !conf){ msg.textContent='Remplissez les champs.'; msg.style.color='var(--danger)'; return; }
-  if(nw.length < 8){ msg.textContent='8 caractères minimum.'; msg.style.color='var(--danger)'; return; }
-  if(nw !== conf){ msg.textContent='Les mots de passe ne correspondent pas.'; msg.style.color='var(--danger)'; return; }
+  if (!nw || !conf)  { msg.textContent = 'Remplissez les champs.'; msg.style.color = 'var(--danger)'; return; }
+  if (nw.length < 8) { msg.textContent = '8 caractères minimum.';  msg.style.color = 'var(--danger)'; return; }
+  if (nw !== conf)   { msg.textContent = 'Les mots de passe ne correspondent pas.'; msg.style.color = 'var(--danger)'; return; }
   const { error } = await sb.auth.updateUser({ password: nw });
-  if(error){ msg.textContent='Erreur : '+error.message; msg.style.color='var(--danger)'; return; }
-  msg.textContent='✓ Mot de passe mis à jour !'; msg.style.color='var(--sage-dark)';
-  ['pwd-new','pwd-confirm'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('pwd-bar').style.width='0';
-  document.getElementById('pwd-hint').textContent='';
-}
-async function changeUsername(){
-  // "Identifiant" = metadata display_name dans Supabase Auth
-  const nu = document.getElementById('new-username').value.trim();
-  if(!nu) return;
-  const { error } = await sb.auth.updateUser({ data: { display_name: nu } });
-  if(!error){
-    document.getElementById('current-username-display').textContent = nu;
-    document.getElementById('new-username').value = '';
-    toast();
-  }
-}
-function checkPwdStrength(val){
-  const bar=document.getElementById('pwd-bar'), hint=document.getElementById('pwd-hint');
-  let s=0;
-  if(val.length>=8)s++;if(val.length>=12)s++;
-  if(/[A-Z]/.test(val))s++;if(/[0-9]/.test(val))s++;if(/[^A-Za-z0-9]/.test(val))s++;
-  const colors=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#27ae60'];
-  const labels=['Très faible','Faible','Moyen','Fort','Très fort'];
-  bar.style.width=(s*20)+'%'; bar.style.background=colors[s-1]||'#eee';
-  hint.textContent=val.length?labels[s-1]||'':'';
+  if (error) { msg.textContent = 'Erreur : ' + error.message; msg.style.color = 'var(--danger)'; return; }
+  msg.textContent = '✓ Mot de passe mis à jour !'; msg.style.color = 'var(--sage-dark)';
+  ['pwd-new','pwd-confirm'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pwd-bar').style.width = '0';
+  document.getElementById('pwd-hint').textContent = '';
 }
 
-// ─── SUPABASE STORAGE — UPLOAD PHOTO ──────────────────────────
-// Les photos sont envoyées dans le bucket Supabase "site-photos".
-// L'URL publique permanente est stockée dans SD (pas la base64).
-// → Les photos survivent aux rechargements de page.
+function checkPwdStrength(val) {
+  const bar = document.getElementById('pwd-bar'), hint = document.getElementById('pwd-hint');
+  let s = 0;
+  if (val.length >= 8) s++; if (val.length >= 12) s++;
+  if (/[A-Z]/.test(val)) s++; if (/[0-9]/.test(val)) s++; if (/[^A-Za-z0-9]/.test(val)) s++;
+  const colors = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#27ae60'];
+  const labels = ['Très faible','Faible','Moyen','Fort','Très fort'];
+  bar.style.width = (s * 20) + '%'; bar.style.background = colors[s-1] || '#eee';
+  hint.textContent = val.length ? (labels[s-1] || '') : '';
+}
 
-async function uploadPhotoToStorage(file, path){
-  // Vérifie que l'utilisateur est connecté
-  if(!currentUser){ toast('⚠ Connectez-vous pour uploader des photos'); return null; }
+// ═══════════════════════════════════════════════════════════
+//  SUPABASE STORAGE — UPLOAD PHOTOS
+// ═══════════════════════════════════════════════════════════
 
+async function uploadPhotoToStorage(file, path) {
+  if (!currentUser) { toast('⚠ Connectez-vous pour uploader'); return null; }
   const ext = file.name.split('.').pop().toLowerCase();
   const fileName = path + '_' + Date.now() + '.' + ext;
-
-  const { data, error } = await sb.storage
-    .from('site-photos')
-    .upload(fileName, file, { upsert: true, contentType: file.type });
-
-  if(error){ console.error('Storage upload error:', error); toast('⚠ Erreur upload photo'); return null; }
-
+  const { error } = await sb.storage.from('site-photos').upload(fileName, file, { upsert: true, contentType: file.type });
+  if (error) { console.error('Upload error:', error); toast('⚠ Erreur upload photo'); return null; }
   const { data: urlData } = sb.storage.from('site-photos').getPublicUrl(fileName);
   return urlData.publicUrl;
 }
 
-// Helper photo universel — gère base64 (preview) + upload Supabase
-async function handlePhotoWithUpload(input, previewId, storageKey, callback){
-  if(!input.files[0]) return;
+// Upload avec prévisualisation + envoi Storage
+async function setSinglePhoto(input, previewId, storageKey, callback) {
+  if (!input.files[0]) return;
   const file = input.files[0];
-
-  // 1. Prévisualisation immédiate en base64
-  const reader = new FileReader();
-  reader.onload = e => {
+  // Preview immédiate
+  const r = new FileReader();
+  r.onload = e => {
     const prev = document.getElementById(previewId);
-    if(prev){ prev.src = e.target.result; prev.classList.add('show'); }
+    if (prev) { prev.src = e.target.result; prev.classList.add('show'); }
   };
-  reader.readAsDataURL(file);
-
-  // 2. Upload vers Supabase Storage
+  r.readAsDataURL(file);
+  // Upload Supabase Storage
   toast('📤 Upload en cours…');
   const publicUrl = await uploadPhotoToStorage(file, storageKey);
-  if(publicUrl && callback){ callback(publicUrl); }
-  else if(!publicUrl){
-    // Fallback base64 si storage échoue (ex: bucket pas encore créé)
+  if (publicUrl && callback) { callback(publicUrl); toast('✓ Photo sauvegardée !'); }
+  else if (!publicUrl) {
+    // Fallback base64 si storage pas encore configuré
     const r2 = new FileReader();
-    r2.onload = e => { if(callback) callback(e.target.result); };
+    r2.onload = e => { if (callback) callback(e.target.result); };
     r2.readAsDataURL(file);
   }
 }
 
-// handlePhoto simple (pour les cas sans upload storage — compatibilité)
-function handlePhoto(input, previewId, callback){
-  if(!input.files[0]) return;
+// handlePhoto simple (preview + callback base64, pas de Storage)
+function handlePhoto(input, previewId, callback) {
+  if (!input.files[0]) return;
   const r = new FileReader();
   r.onload = e => {
     const prev = document.getElementById(previewId);
-    if(prev){ prev.src = e.target.result; prev.classList.add('show'); }
-    if(callback) callback(e.target.result);
+    if (prev) { prev.src = e.target.result; prev.classList.add('show'); }
+    if (callback) callback(e.target.result);
   };
   r.readAsDataURL(input.files[0]);
 }
 
-// ─── SYNC CLOUD — SAUVEGARDE DANS SUPABASE ────────────────────
-async function syncToCloud(){
-  if(!currentUser){ console.warn('Non connecté, sync ignoré'); return; }
+// ═══════════════════════════════════════════════════════════
+//  SYNC SUPABASE — SAUVEGARDE & CHARGEMENT
+// ═══════════════════════════════════════════════════════════
 
-  // On ne stocke PAS les base64 des photos (trop lourd, >1Mo par photo)
-  // On stocke uniquement les URLs publiques Supabase Storage
-  const sdToSave = JSON.parse(JSON.stringify(SD)); // deep clone
-
-  const { error } = await sb
-    .from('site_content')
-    .upsert({ id: 1, content: sdToSave }, { onConflict: 'id' });
-
-  if(error){ console.error('syncToCloud error:', error); toast('⚠ Erreur sauvegarde cloud'); }
+async function syncToCloud() {
+  if (!currentUser) {
+    const { data } = await sb.auth.getSession();
+    if (data.session) { currentUser = data.session.user; }
+    else { toast('⚠ Non connecté, sauvegarde ignorée'); return; }
+  }
+  const { error } = await sb.from('site_content').upsert({ id: 1, content: SD }, { onConflict: 'id' });
+  if (error) { console.error('syncToCloud error:', error); toast('⚠ Erreur sauvegarde'); }
   else { toast('✓ Sauvegardé !'); }
 }
 
-// ─── LOAD FROM CLOUD ──────────────────────────────────────────
-async function loadFromCloud(){
+async function loadFromCloud() {
   // Affichage immédiat avec valeurs par défaut
-  buildNav(); renderSoins(); renderTarifs(); rebuildCustom(); goPage('home');
+  buildNav(); renderSoins(); renderTarifs(); rebuildCustom();
 
   try {
-    const { data, error } = await sb
-      .from('site_content')
-      .select('content')
-      .eq('id', 1)
-      .maybeSingle();
-
-    if(!error && data && data.content){
+    const { data, error } = await sb.from('site_content').select('content').eq('id', 1).maybeSingle();
+    if (!error && data && data.content) {
       const cloud = data.content;
-      // Merge sécurisé : les clés nav sont toujours présentes
-      const safeVis = {home:true,about:true,soins:true,tarifs:true,contact:true};
-      if(cloud.navVisible) Object.assign(safeVis, cloud.navVisible);
-      const safeLbl = {home:'Accueil',about:'À propos',soins:'Soins',tarifs:'Tarifs',contact:'Rendez-vous'};
-      if(cloud.navLabels) Object.assign(safeLbl, cloud.navLabels);
+      const safeVis = { home:true, about:true, soins:true, tarifs:true, contact:true };
+      const safeLbl = { home:'Accueil', about:'À propos', soins:'Soins', tarifs:'Tarifs', contact:'Rendez-vous' };
+      if (cloud.navVisible) Object.assign(safeVis, cloud.navVisible);
+      if (cloud.navLabels)  Object.assign(safeLbl, cloud.navLabels);
       SD = Object.assign({}, SD, cloud);
       SD.navVisible = safeVis;
       SD.navLabels  = safeLbl;
-      console.log('✓ Données cloud chargées');
-      buildNav(); renderSoins(); renderTarifs(); rebuildCustom(); goPage('home');
-    } else {
-      console.log('Pas de données cloud — valeurs par défaut conservées');
+      buildNav(); renderSoins(); renderTarifs(); rebuildCustom();
     }
-  } catch(e){
+  } catch(e) {
     console.warn('loadFromCloud échoué:', e);
   }
 }
 
-// ─── DATA ─────────────────────────────────────────────────────
-let SD = {
-  navLabels:{home:'Accueil',about:'À propos',soins:'Soins',tarifs:'Tarifs',contact:'Rendez-vous'},
-  navVisible:{home:true,about:true,soins:true,tarifs:true,contact:true},
-  hero:{title:'Retrouvez votre <em>équilibre intérieur</em>',desc:'La sophrologie est un voyage vers soi. À travers des techniques douces de relaxation et de visualisation positive, je vous accompagne vers un mieux-être durable.'},
-  about:{title:'Une approche <em>douce et personnalisée</em>',p1:"Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l'écoute de chaque personne dans sa singularité.",p2:"Je vous propose un accompagnement sur-mesure, que vous souhaitiez gérer le stress, améliorer votre sommeil, préparer une naissance ou traverser une période difficile.",sig:'— Nadia Aoussi',annees:'10+',anneesVisible:true,photo:null},
-  soins:[
-    {id:1,icon:'🌬️',titre:'Gestion du stress',desc:'Libérez les tensions et retrouvez calme et sérénité grâce à des exercices de respiration et de détente musculaire.',tag:'Séance individuelle',photo:null},
-    {id:2,icon:'😴',titre:'Sommeil & récupération',desc:'Retrouvez un sommeil de qualité avec des techniques adaptées aux troubles du sommeil et à la fatigue chronique.',tag:'Programme 6 séances',photo:null},
-    {id:3,icon:'🤰',titre:'Maternité & naissance',desc:'Préparez votre accouchement sereinement avec la sophrologie périnatale. Un accompagnement doux pour vous et votre bébé.',tag:'Femmes enceintes',photo:null},
-    {id:4,icon:'🎯',titre:'Confiance en soi',desc:'Renforcez votre estime personnelle, surmontez vos blocages et développez vos ressources intérieures.',tag:'Développement personnel',photo:null},
-    {id:5,icon:'🏃',titre:'Performance sportive',desc:'Concentration, visualisation positive, gestion du trac avant une compétition.',tag:'Préparation mentale',photo:null},
-    {id:6,icon:'🌸',titre:'Accompagnement enfants',desc:'Séances adaptées aux enfants et adolescents pour gérer le stress scolaire, les angoisses et renforcer la concentration.',tag:'Enfants & ados',photo:null}
-  ],
-  tarifs:[
-    {id:1,titre:'Découverte',prix:'65',duree:'60 min',features:['Bilan & objectifs','Première séance','Exercices à domicile'],featured:false},
-    {id:2,titre:'Suivi mensuel',prix:'220',duree:'4 séances/mois',features:['4 séances de 60 min','Suivi personnalisé','Audio relaxation offert','Support entre séances'],featured:true},
-    {id:3,titre:'Pack intensif',prix:'350',duree:'6 séances',features:['6 séances de 60 min','Bilan initial & final','Enregistrements audio'],featured:false}
-  ],
-  tarifs_sub:'Des formules adaptées à vos besoins. Remboursement possible par certaines mutuelles.',
-  contact:{title:'Je suis à votre écoute',adresse:'12 rue des Lilas, 75006 Paris',tel:'06 12 34 56 78',email:'contact@nadia-sophrologie.fr',horaires:'Lun–Ven : 9h–19h · Sam : 9h–13h'},
-  customPages:[]
-};
-let soinIdC=10, pageIdC=100, tarifIdC=10;
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION & ROUTING
+// ═══════════════════════════════════════════════════════════
 
-// ─── NAVIGATION ───────────────────────────────────────────────
-const FIXED_PAGES=['home','about','soins','tarifs','contact'];
-function buildNav(){
-  const nl=document.getElementById('navLinks'); nl.innerHTML='';
-  FIXED_PAGES.forEach(key=>{
-    if(!SD.navVisible[key])return;
-    const li=document.createElement('li');
-    li.innerHTML=`<a onclick="goPage('${key}')" id="nav-${key}" class="${key==='contact'?'nav-cta':''}">${SD.navLabels[key]}</a>`;
+const FIXED_PAGES = ['home','about','soins','tarifs','contact'];
+
+function buildNav() {
+  const nl = document.getElementById('navLinks'); nl.innerHTML = '';
+  FIXED_PAGES.forEach(key => {
+    if (!SD.navVisible[key]) return;
+    const li = document.createElement('li');
+    li.innerHTML = `<a onclick="goPage('${key}')" id="nav-${key}" class="${key === 'contact' ? 'nav-cta' : ''}">${SD.navLabels[key]}</a>`;
     nl.appendChild(li);
   });
-  SD.customPages.forEach(p=>{
-    if(p.visible===false)return;
-    const li=document.createElement('li');
-    li.innerHTML=`<a onclick="goPage('cp-${p.id}')" id="nav-cp-${p.id}">${p.navTitle}</a>`;
-    li.classList.add('cpnav');
-    const ctaLi=nl.querySelector('.nav-cta')?.parentElement;
-    if(ctaLi)nl.insertBefore(li,ctaLi);else nl.appendChild(li);
+  SD.customPages.forEach(p => {
+    if (p.visible === false) return;
+    const li = document.createElement('li');
+    li.innerHTML = `<a onclick="goPage('cp-${p.id}')" id="nav-cp-${p.id}">${p.navTitle}</a>`;
+    const ctaLi = nl.querySelector('.nav-cta')?.parentElement;
+    if (ctaLi) nl.insertBefore(li, ctaLi); else nl.appendChild(li);
   });
   buildFooter(); markActiveNav();
 }
-function buildFooter(){
-  const fl=document.getElementById('footerLinks'); fl.innerHTML='';
-  FIXED_PAGES.forEach(key=>{
-    if(!SD.navVisible[key])return;
-    const a=document.createElement('a');a.textContent=SD.navLabels[key];a.onclick=()=>goPage(key);fl.appendChild(a);
+
+function buildFooter() {
+  const fl = document.getElementById('footerLinks'); fl.innerHTML = '';
+  FIXED_PAGES.forEach(key => {
+    if (!SD.navVisible[key]) return;
+    const a = document.createElement('a');
+    a.textContent = SD.navLabels[key];
+    a.onclick = () => goPage(key);
+    fl.appendChild(a);
   });
-  SD.customPages.forEach(p=>{
-    if(p.visible===false)return;
-    const a=document.createElement('a');a.textContent=p.navTitle;a.onclick=()=>goPage('cp-'+p.id);fl.appendChild(a);
+  SD.customPages.forEach(p => {
+    if (p.visible === false) return;
+    const a = document.createElement('a');
+    a.textContent = p.navTitle;
+    a.onclick = () => goPage('cp-' + p.id);
+    fl.appendChild(a);
   });
-  const adm=document.createElement('a');adm.textContent='⚙ Admin';adm.onclick=()=>goPage('admin');fl.appendChild(adm);
-}
-function markActiveNav(){
-  document.querySelectorAll('#navLinks a').forEach(a=>a.classList.remove('active'));
-  const cur=document.body.dataset.page||'home';
-  const el=document.getElementById('nav-'+cur)||document.getElementById('nav-cp-'+cur.replace('cp-',''));
-  if(el)el.classList.add('active');
+  // Lien admin : quasi invisible, visible seulement si connecté
+  if (currentUser) {
+    const adm = document.createElement('a');
+    adm.textContent = '·';
+    adm.className = 'admin-link';
+    adm.title = 'Administration';
+    adm.onclick = () => goPage('admin');
+    fl.appendChild(adm);
+  }
 }
 
-// ─── ROUTING ──────────────────────────────────────────────────
-function goPage(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const el=document.getElementById('page-'+page);
-  if(el)el.classList.add('active');
-  document.body.dataset.page=page;
-  window.scrollTo(0,0);
-  document.getElementById('mainFooter').style.display=page==='admin'?'none':'block';
+function markActiveNav() {
+  document.querySelectorAll('#navLinks a').forEach(a => a.classList.remove('active'));
+  const cur = document.body.dataset.page || 'home';
+  const el = document.getElementById('nav-' + cur) || document.getElementById('nav-cp-' + cur.replace('cp-',''));
+  if (el) el.classList.add('active');
+}
+
+async function goPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  document.body.dataset.page = page;
+  window.scrollTo(0, 0);
+  document.getElementById('mainFooter').style.display = page === 'admin' ? 'none' : 'block';
   markActiveNav();
-  if(page==='admin')initAdmin();
-  if(page==='soins')renderSoins();
-  if(page==='tarifs')renderTarifs();
+
+  // Mise à jour du hash dans l'URL (pour bookmarking)
+  history.replaceState(null, '', page === 'home' ? '/' : '#' + page);
+
+  if (page === 'admin') {
+    if (!currentUser) {
+      const { data } = await sb.auth.getSession();
+      if (data.session) { currentUser = data.session.user; }
+      else { goPage('home'); return; } // Redirige si non connecté
+    }
+    // Affiche login ou dashboard selon l'état
+    if (currentUser) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminDash').classList.add('active');
+      document.getElementById('current-username-display').textContent = currentUser.email;
+      loadAdminFields();
+    } else {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('adminDash').classList.remove('active');
+    }
+    buildFooter();
+    return;
+  }
+  if (page === 'soins')  renderSoins();
+  if (page === 'tarifs') renderTarifs();
 }
 
-// ─── RENDERS ──────────────────────────────────────────────────
-function renderSoins(){
-  document.getElementById('soins-container').innerHTML=SD.soins.map(s=>`
+// ═══════════════════════════════════════════════════════════
+//  RENDERS PUBLICS
+// ═══════════════════════════════════════════════════════════
+
+function renderSoins() {
+  document.getElementById('soins-container').innerHTML = SD.soins.map(s => `
     <div class="soin-card">
-      ${s.photo?`<img class="soin-img" src="${s.photo}" alt="${s.titre}">`:`<div class="soin-placeholder">${s.icon}</div>`}
+      ${s.photo ? `<img class="soin-img" src="${s.photo}" alt="${s.titre}">` : `<div class="soin-placeholder">${s.icon}</div>`}
       <div class="soin-body"><h3>${s.titre}</h3><p>${s.desc}</p><span class="soin-tag">${s.tag}</span></div>
     </div>`).join('');
 }
-function renderTarifs(){
-  document.getElementById('tarifs-sub').textContent=SD.tarifs_sub;
-  document.getElementById('tarifs-container').innerHTML=SD.tarifs.map(t=>`
-    <div class="tarif-card ${t.featured?'featured':''}">
+
+function renderTarifs() {
+  document.getElementById('tarifs-sub').textContent = SD.tarifs_sub;
+  document.getElementById('tarifs-container').innerHTML = SD.tarifs.map(t => `
+    <div class="tarif-card ${t.featured ? 'featured' : ''}">
       <h3>${t.titre}</h3><div class="tarif-prix"><sup>€</sup>${t.prix}</div>
       <p class="tarif-duree">${t.duree}</p>
-      <ul class="tarif-features">${t.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <ul class="tarif-features">${t.features.map(f => `<li>${f}</li>`).join('')}</ul>
       <button class="btn-tarif" onclick="goPage('contact')">Réserver</button>
     </div>`).join('');
 }
 
-// ─── CUSTOM PAGES ─────────────────────────────────────────────
-function rebuildCustom(){
+// ═══════════════════════════════════════════════════════════
+//  PAGES PERSONNALISÉES
+// ═══════════════════════════════════════════════════════════
+
+function rebuildCustom() {
   buildNav();
-  const c=document.getElementById('custom-pages-container');c.innerHTML='';
-  SD.customPages.forEach(p=>{
-    const div=document.createElement('div');div.className='page';div.id='page-cp-'+p.id;
-    div.innerHTML=`<div class="custom-wrap"><div class="custom-inner">
-      ${p.photo?`<img class="custom-cover" src="${p.photo}" alt="">`:''}
-      ${p.sub?`<span class="section-tag">${p.sub}</span>`:''}
+  const c = document.getElementById('custom-pages-container'); c.innerHTML = '';
+  SD.customPages.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'page'; div.id = 'page-cp-' + p.id;
+    div.innerHTML = `<div class="custom-wrap"><div class="custom-inner">
+      ${p.photo ? `<img class="custom-cover" src="${p.photo}" alt="">` : ''}
+      ${p.sub   ? `<span class="section-tag">${p.sub}</span>` : ''}
       <h1>${p.heading}</h1>
-      <div class="custom-body">${p.body||''}</div>
+      <div class="custom-body">${p.body || ''}</div>
     </div></div>`;
     c.appendChild(div);
   });
-  const sec=document.getElementById('custom-menu-section');sec.innerHTML='';
-  if(SD.customPages.length){
-    const t=document.createElement('div');t.className='msec';t.textContent='Pages perso';sec.appendChild(t);
-    SD.customPages.forEach(p=>{
-      const li=document.createElement('li');
-      li.innerHTML=`<a onclick="showPanel('p-cp-${p.id}')" id="m-cp-${p.id}">📄 ${p.navTitle}</a>`;
+  const sec = document.getElementById('custom-menu-section'); sec.innerHTML = '';
+  if (SD.customPages.length) {
+    const t = document.createElement('div'); t.className = 'msec'; t.textContent = 'Pages perso'; sec.appendChild(t);
+    SD.customPages.forEach(p => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a onclick="showPanel('p-cp-${p.id}')" id="m-cp-${p.id}">📄 ${p.navTitle}</a>`;
       sec.appendChild(li);
     });
   }
-  buildCustomAdminPanels();updatePagesList();buildCustomNavTable();
+  buildCustomAdminPanels(); updatePagesList(); buildCustomNavTable();
 }
-function buildCustomAdminPanels(){
-  const c=document.getElementById('custom-admin-panels');c.innerHTML='';
-  SD.customPages.forEach(p=>{
-    const d=document.createElement('div');d.className='admin-panel';d.id='p-cp-'+p.id;
-    d.innerHTML=`<h2>Page : ${p.navTitle}</h2>
+
+function buildCustomAdminPanels() {
+  const c = document.getElementById('custom-admin-panels'); c.innerHTML = '';
+  SD.customPages.forEach(p => {
+    const d = document.createElement('div'); d.className = 'admin-panel'; d.id = 'p-cp-' + p.id;
+    d.innerHTML = `<h2>Page : ${p.navTitle}</h2>
       <div class="acard"><h4>${p.navTitle}
         <div style="display:flex;gap:8px">
           <button class="btn-sm" onclick="openEdit(${p.id})">✏️ Modifier</button>
           <button class="btn-danger" onclick="confirmDel(${p.id})">🗑 Supprimer</button>
         </div></h4>
-        <div style="background:var(--sand);padding:14px;border-radius:8px;font-size:14px;color:var(--text-light);white-space:pre-wrap;max-height:160px;overflow:auto;line-height:1.7">${p.body||'(vide)'}</div>
+        <div style="background:var(--sand);padding:14px;border-radius:8px;font-size:14px;color:var(--text-light);white-space:pre-wrap;max-height:160px;overflow:auto;line-height:1.7">${p.body || '(vide)'}</div>
         <div style="margin-top:14px"><button class="btn-primary" onclick="goPage('cp-${p.id}')">👁 Voir →</button></div>
       </div>`;
     c.appendChild(d);
   });
 }
-function updatePagesList(){
-  const l=document.getElementById('pages-list');
-  if(!SD.customPages.length){l.innerHTML='<p style="color:var(--text-light);font-size:14px">Aucune page pour l\'instant.</p>';return;}
-  l.innerHTML=SD.customPages.map(p=>`
+
+function updatePagesList() {
+  const l = document.getElementById('pages-list');
+  if (!SD.customPages.length) { l.innerHTML = '<p style="color:var(--text-light);font-size:14px">Aucune page pour l\'instant.</p>'; return; }
+  l.innerHTML = SD.customPages.map(p => `
     <div class="page-list-item">
       <div class="pli-info"><div class="name">${p.navTitle}</div><div class="slug">${p.heading}</div></div>
       <div class="pli-actions">
@@ -959,120 +955,149 @@ function updatePagesList(){
       </div>
     </div>`).join('');
 }
-function createCustomPage(){
-  const nav=document.getElementById('np-nav').value.trim();
-  const head=document.getElementById('np-heading').value.trim();
-  if(!nav||!head){alert('Renseignez le libellé menu et le titre.');return;}
-  const id=++pageIdC;
-  const prev=document.getElementById('np-photo-prev');
-  SD.customPages.push({id,navTitle:nav,heading:head,sub:document.getElementById('np-sub').value.trim(),body:document.getElementById('np-body').value,photo:prev.classList.contains('show')?prev.src:null,visible:true});
-  ['np-nav','np-heading','np-sub','np-body'].forEach(i=>document.getElementById(i).value='');
-  prev.src='';prev.classList.remove('show');
-  rebuildCustom();syncToCloud();showPanel('p-cp-'+id);
+
+function createCustomPage() {
+  const nav  = document.getElementById('np-nav').value.trim();
+  const head = document.getElementById('np-heading').value.trim();
+  if (!nav || !head) { alert('Renseignez le libellé menu et le titre.'); return; }
+  const id   = ++pageIdC;
+  const prev = document.getElementById('np-photo-prev');
+  SD.customPages.push({ id, navTitle:nav, heading:head, sub:document.getElementById('np-sub').value.trim(), body:document.getElementById('np-body').value, photo:prev.classList.contains('show') ? prev.src : null, visible:true });
+  ['np-nav','np-heading','np-sub','np-body'].forEach(i => document.getElementById(i).value = '');
+  prev.src = ''; prev.classList.remove('show');
+  rebuildCustom(); syncToCloud(); showPanel('p-cp-' + id);
 }
-function openEdit(id){
-  const p=SD.customPages.find(x=>x.id===id);if(!p)return;
-  document.getElementById('em-id').value=id;
-  document.getElementById('em-nav').value=p.navTitle;
-  document.getElementById('em-heading').value=p.heading;
-  document.getElementById('em-sub').value=p.sub||'';
-  document.getElementById('em-body').value=p.body||'';
-  const prev=document.getElementById('em-photo-prev');
-  if(p.photo){prev.src=p.photo;prev.classList.add('show');}else{prev.src='';prev.classList.remove('show');}
+
+function openEdit(id) {
+  const p = SD.customPages.find(x => x.id === id); if (!p) return;
+  document.getElementById('em-id').value      = id;
+  document.getElementById('em-nav').value     = p.navTitle;
+  document.getElementById('em-heading').value = p.heading;
+  document.getElementById('em-sub').value     = p.sub || '';
+  document.getElementById('em-body').value    = p.body || '';
+  const prev = document.getElementById('em-photo-prev');
+  if (p.photo) { prev.src = p.photo; prev.classList.add('show'); } else { prev.src = ''; prev.classList.remove('show'); }
   document.getElementById('editModal').classList.add('open');
 }
-function saveEditPage(){
-  const id=parseInt(document.getElementById('em-id').value);
-  const p=SD.customPages.find(x=>x.id===id);if(!p)return;
-  p.navTitle=document.getElementById('em-nav').value.trim();
-  p.heading=document.getElementById('em-heading').value.trim();
-  p.sub=document.getElementById('em-sub').value.trim();
-  p.body=document.getElementById('em-body').value;
-  const prev=document.getElementById('em-photo-prev');
-  p.photo=prev.classList.contains('show')?prev.src:null;
-  closeModal();rebuildCustom();syncToCloud();
-}
-function confirmDeletePage(){if(confirm('Supprimer cette page ?')){const id=parseInt(document.getElementById('em-id').value);closeModal();delPage(id);}}
-function confirmDel(id){if(confirm('Supprimer cette page ?'))delPage(id);}
-function delPage(id){SD.customPages=SD.customPages.filter(x=>x.id!==id);rebuildCustom();syncToCloud();showPanel('p-pages');toast();}
-function closeModal(){document.getElementById('editModal').classList.remove('open');}
-document.getElementById('editModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
-// ─── NAV MANAGER ──────────────────────────────────────────────
-const FIXED_LABELS={home:'Accueil',about:'À propos',soins:'Soins',tarifs:'Tarifs',contact:'Rendez-vous'};
-function buildFixedNavTable(){
-  document.getElementById('fixed-nav-body').innerHTML=FIXED_PAGES.map(key=>`
+function saveEditPage() {
+  const id = parseInt(document.getElementById('em-id').value);
+  const p  = SD.customPages.find(x => x.id === id); if (!p) return;
+  p.navTitle = document.getElementById('em-nav').value.trim();
+  p.heading  = document.getElementById('em-heading').value.trim();
+  p.sub      = document.getElementById('em-sub').value.trim();
+  p.body     = document.getElementById('em-body').value;
+  const prev = document.getElementById('em-photo-prev');
+  p.photo    = prev.classList.contains('show') ? prev.src : null;
+  closeModal(); rebuildCustom(); syncToCloud();
+}
+
+function confirmDeletePage() { if (confirm('Supprimer cette page ?')) { const id = parseInt(document.getElementById('em-id').value); closeModal(); delPage(id); } }
+function confirmDel(id) { if (confirm('Supprimer cette page ?')) delPage(id); }
+function delPage(id) { SD.customPages = SD.customPages.filter(x => x.id !== id); rebuildCustom(); syncToCloud(); showPanel('p-pages'); }
+function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+document.getElementById('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+// ═══════════════════════════════════════════════════════════
+//  GESTIONNAIRE DE NAVIGATION (admin)
+// ═══════════════════════════════════════════════════════════
+
+const FIXED_LABELS = { home:'Accueil', about:'À propos', soins:'Soins', tarifs:'Tarifs', contact:'Rendez-vous' };
+
+function buildFixedNavTable() {
+  document.getElementById('fixed-nav-body').innerHTML = FIXED_PAGES.map(key => `
     <tr class="fixed-row">
       <td><strong style="font-size:13px">${FIXED_LABELS[key]}</strong></td>
       <td><input type="text" id="nl-${key}" value="${SD.navLabels[key]}" style="width:100%"></td>
       <td><span class="page-type">Fixe</span></td>
-      <td style="text-align:center"><button class="toggle-vis" onclick="toggleFixed('${key}')" id="vis-${key}">${SD.navVisible[key]?'👁':'🙈'}</button></td>
+      <td style="text-align:center"><button class="toggle-vis" onclick="toggleFixed('${key}')" id="vis-${key}">${SD.navVisible[key] ? '👁' : '🙈'}</button></td>
     </tr>`).join('');
 }
-function toggleFixed(key){
-  if(key==='home'){alert('La page Accueil ne peut pas être masquée.');return;}
-  SD.navVisible[key]=!SD.navVisible[key];
-  document.getElementById('vis-'+key).textContent=SD.navVisible[key]?'👁':'🙈';
+
+function toggleFixed(key) {
+  if (key === 'home') { alert('La page Accueil ne peut pas être masquée.'); return; }
+  SD.navVisible[key] = !SD.navVisible[key];
+  document.getElementById('vis-' + key).textContent = SD.navVisible[key] ? '👁' : '🙈';
   buildNav();
 }
-function saveNavTitles(){
-  FIXED_PAGES.forEach(key=>{const el=document.getElementById('nl-'+key);if(el)SD.navLabels[key]=el.value.trim()||SD.navLabels[key];});
-  buildNav();syncToCloud();toast();
+
+function saveNavTitles() {
+  FIXED_PAGES.forEach(key => {
+    const el = document.getElementById('nl-' + key);
+    if (el) SD.navLabels[key] = el.value.trim() || SD.navLabels[key];
+  });
+  buildNav(); syncToCloud(); toast();
 }
-function buildCustomNavTable(){
-  const card=document.getElementById('custom-nav-table-card');
-  const tbody=document.getElementById('custom-nav-body');
-  if(!SD.customPages.length){card.style.display='none';return;}
-  card.style.display='block';
-  tbody.innerHTML=SD.customPages.map(p=>`
+
+function buildCustomNavTable() {
+  const card  = document.getElementById('custom-nav-table-card');
+  const tbody = document.getElementById('custom-nav-body');
+  if (!SD.customPages.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  tbody.innerHTML = SD.customPages.map(p => `
     <tr>
       <td><strong style="font-size:13px">${p.heading}</strong></td>
       <td><input type="text" id="cnl-${p.id}" value="${p.navTitle}" style="width:100%" onchange="updateCustomNavLabel(${p.id},this.value)"></td>
-      <td style="text-align:center"><button class="toggle-vis" onclick="toggleCustomVis(${p.id})" id="cvis-${p.id}">${p.visible!==false?'👁':'🙈'}</button></td>
+      <td style="text-align:center"><button class="toggle-vis" onclick="toggleCustomVis(${p.id})" id="cvis-${p.id}">${p.visible !== false ? '👁' : '🙈'}</button></td>
       <td><button class="btn-danger" style="font-size:11px;padding:4px 10px" onclick="confirmDel(${p.id})">🗑</button></td>
     </tr>`).join('');
 }
-function toggleCustomVis(id){const p=SD.customPages.find(x=>x.id===id);if(!p)return;p.visible=!(p.visible!==false);document.getElementById('cvis-'+id).textContent=p.visible?'👁':'🙈';buildNav();}
-function updateCustomNavLabel(id,val){const p=SD.customPages.find(x=>x.id===id);if(p)p.navTitle=val;buildNav();}
 
-// ─── ADMIN UI ─────────────────────────────────────────────────
-function loadAdminFields(){
-  document.getElementById('a-hero-title').value=SD.hero.title;
-  document.getElementById('a-hero-desc').value=SD.hero.desc;
-  document.getElementById('a-about-title').value=SD.about.title;
-  document.getElementById('a-about-p1').value=SD.about.p1;
-  document.getElementById('a-about-p2').value=SD.about.p2;
-  document.getElementById('a-about-sig').value=SD.about.sig;
-  document.getElementById('a-about-annees').value=SD.about.annees||'10+';
-  document.getElementById('a-about-annees-vis').checked=SD.about.anneesVisible!==false;
-  if(SD.about.photo){const p=document.getElementById('about-photo-prev');p.src=SD.about.photo;p.classList.add('show');document.getElementById('about-photo-rm').style.display='inline-block';}
-  document.getElementById('a-tarifs-sub').value=SD.tarifs_sub;
-  document.getElementById('a-ct-title').value=SD.contact.title;
-  document.getElementById('a-ct-adresse').value=SD.contact.adresse;
-  document.getElementById('a-ct-tel').value=SD.contact.tel;
-  document.getElementById('a-ct-email').value=SD.contact.email;
-  document.getElementById('a-ct-horaires').value=SD.contact.horaires;
-  if(currentUser) document.getElementById('current-username-display').textContent=currentUser.email;
-  buildSoinsAdmin();buildTarifsAdmin();buildFixedNavTable();buildCustomNavTable();buildCustomAdminPanels();updatePagesList();
-}
-function showPanel(id){
-  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
-  const el=document.getElementById(id);if(el)el.classList.add('active');
-  document.querySelectorAll('.admin-menu a').forEach(a=>a.classList.remove('active'));
-  const m=document.getElementById('m-'+id.replace('p-',''));if(m)m.classList.add('active');
-}
-function toast(msg='✓ Enregistré !'){
-  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
-  setTimeout(()=>t.style.display='none',2500);
+function toggleCustomVis(id)         { const p = SD.customPages.find(x => x.id === id); if (!p) return; p.visible = !(p.visible !== false); document.getElementById('cvis-' + id).textContent = p.visible ? '👁' : '🙈'; buildNav(); }
+function updateCustomNavLabel(id,val) { const p = SD.customPages.find(x => x.id === id); if (p) p.navTitle = val; buildNav(); }
+
+// ═══════════════════════════════════════════════════════════
+//  ADMIN UI
+// ═══════════════════════════════════════════════════════════
+
+function loadAdminFields() {
+  document.getElementById('a-hero-title').value           = SD.hero.title;
+  document.getElementById('a-hero-desc').value            = SD.hero.desc;
+  document.getElementById('a-about-title').value          = SD.about.title;
+  document.getElementById('a-about-p1').value             = SD.about.p1;
+  document.getElementById('a-about-p2').value             = SD.about.p2;
+  document.getElementById('a-about-sig').value            = SD.about.sig;
+  document.getElementById('a-about-annees').value         = SD.about.annees || '10+';
+  document.getElementById('a-about-annees-vis').checked   = SD.about.anneesVisible !== false;
+  if (SD.about.photo) {
+    const p = document.getElementById('about-photo-prev');
+    p.src = SD.about.photo; p.classList.add('show');
+    document.getElementById('about-photo-rm').style.display = 'inline-block';
+  }
+  document.getElementById('a-tarifs-sub').value     = SD.tarifs_sub;
+  document.getElementById('a-ct-title').value       = SD.contact.title;
+  document.getElementById('a-ct-adresse').value     = SD.contact.adresse;
+  document.getElementById('a-ct-tel').value         = SD.contact.tel;
+  document.getElementById('a-ct-email').value       = SD.contact.email;
+  document.getElementById('a-ct-horaires').value    = SD.contact.horaires;
+  if (currentUser) document.getElementById('current-username-display').textContent = currentUser.email;
+  buildSoinsAdmin(); buildTarifsAdmin(); buildFixedNavTable(); buildCustomNavTable(); buildCustomAdminPanels(); updatePagesList();
 }
 
-// ─── SOINS ADMIN ──────────────────────────────────────────────
-function buildSoinsAdmin(){document.getElementById('soins-admin-list').innerHTML=SD.soins.map(s=>buildSoinCard(s)).join('');}
-function buildSoinCard(s){
-  const hp=!!s.photo;
+function showPanel(id) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id); if (el) el.classList.add('active');
+  document.querySelectorAll('.admin-menu a').forEach(a => a.classList.remove('active'));
+  const m = document.getElementById('m-' + id.replace('p-','')); if (m) m.classList.add('active');
+}
+
+function toast(msg = '✓ Enregistré !') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SOINS ADMIN
+// ═══════════════════════════════════════════════════════════
+
+function buildSoinsAdmin() { document.getElementById('soins-admin-list').innerHTML = SD.soins.map(s => buildSoinCard(s)).join(''); }
+
+function buildSoinCard(s) {
+  const hp = !!s.photo;
   return `<div class="sac" id="sac-${s.id}">
     <div class="sac-head" onclick="toggleSoin(${s.id})">
-      ${hp?`<img class="sac-thumb" src="${s.photo}" alt="">`:`<div class="sac-emoji">${s.icon}</div>`}
+      ${hp ? `<img class="sac-thumb" src="${s.photo}" alt="">` : `<div class="sac-emoji">${s.icon}</div>`}
       <span class="sac-label" id="sl-${s.id}">${s.titre}</span>
       <button class="sac-toggle" id="st-${s.id}">▾</button>
       <button class="btn-danger" style="font-size:11px;padding:5px 10px" onclick="event.stopPropagation();removeSoin(${s.id})">✕</button>
@@ -1085,57 +1110,69 @@ function buildSoinCard(s){
       <div class="af"><label>Description</label><textarea id="s-d-${s.id}">${s.desc}</textarea></div>
       <div class="af"><label>Tag</label><input type="text" id="s-g-${s.id}" value="${s.tag}"></div>
       <div class="af">
-        <label>📷 Photo (stockée sur Supabase, permanente)</label>
+        <label>📷 Photo (stockée sur Supabase Storage)</label>
         <div class="upload-zone">
           <input type="file" id="s-ph-${s.id}" accept="image/*" onchange="setSoinPhoto(this,${s.id})">
           <p class="upload-lbl">📷 Uploader une photo</p>
-          <img id="s-pv-${s.id}" class="upload-preview ${hp?'show':''}" src="${s.photo||''}" alt="">
+          <img id="s-pv-${s.id}" class="upload-preview ${hp ? 'show' : ''}" src="${s.photo || ''}" alt="">
         </div>
-        ${hp?`<button class="remove-photo" onclick="clearSoinPhoto(${s.id})">✕ Retirer</button>`:''}
+        ${hp ? `<button class="remove-photo" onclick="clearSoinPhoto(${s.id})">✕ Retirer</button>` : ''}
       </div>
     </div>
   </div>`;
 }
-function toggleSoin(id){const b=document.getElementById('sb-'+id),t=document.getElementById('st-'+id);b.classList.toggle('collapsed');t.textContent=b.classList.contains('collapsed')?'▸':'▾';}
-function addSoin(){
-  const id=++soinIdC;
-  SD.soins.push({id,icon:'✨',titre:'Nouveau soin',desc:'Décrivez ce soin.',tag:'Séance individuelle',photo:null});
-  const list=document.getElementById('soins-admin-list');
-  const tmp=document.createElement('div');tmp.innerHTML=buildSoinCard(SD.soins[SD.soins.length-1]);
-  list.appendChild(tmp.firstElementChild);list.lastElementChild.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-function removeSoin(id){
-  if(!confirm('Supprimer ce soin ?'))return;
-  SD.soins=SD.soins.filter(s=>s.id!==id);
-  document.getElementById('sac-'+id)?.remove();
-  renderSoins();syncToCloud();toast();
-}
-async function setSoinPhoto(input,id){
-  if(!input.files[0])return;
-  const file=input.files[0];
-  // Preview immédiat
-  const r=new FileReader();r.onload=e=>{const p=document.getElementById('s-pv-'+id);p.src=e.target.result;p.classList.add('show');};r.readAsDataURL(file);
-  // Upload Storage
-  toast('📤 Upload photo…');
-  const url=await uploadPhotoToStorage(file,'soin-'+id);
-  const soin=SD.soins.find(s=>s.id===id);
-  if(soin){ soin.photo=url||null; buildSoinsAdmin(); }
-}
-function clearSoinPhoto(id){const s=SD.soins.find(x=>x.id===id);if(s)s.photo=null;buildSoinsAdmin();}
-function saveSoins(){
-  SD.soins.forEach(s=>{
-    const ti=document.getElementById('s-t-'+s.id),ic=document.getElementById('s-i-'+s.id),de=document.getElementById('s-d-'+s.id),ta=document.getElementById('s-g-'+s.id);
-    if(ti)s.titre=ti.value;if(ic)s.icon=ic.value;if(de)s.desc=de.value;if(ta)s.tag=ta.value;
-  });
-  renderSoins();syncToCloud();
+
+function toggleSoin(id) { const b = document.getElementById('sb-'+id), t = document.getElementById('st-'+id); b.classList.toggle('collapsed'); t.textContent = b.classList.contains('collapsed') ? '▸' : '▾'; }
+
+function addSoin() {
+  const id = ++soinIdC;
+  SD.soins.push({ id, icon:'✨', titre:'Nouveau soin', desc:'Décrivez ce soin.', tag:'Séance individuelle', photo:null });
+  const list = document.getElementById('soins-admin-list');
+  const tmp  = document.createElement('div'); tmp.innerHTML = buildSoinCard(SD.soins[SD.soins.length-1]);
+  list.appendChild(tmp.firstElementChild);
+  list.lastElementChild.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-// ─── TARIFS ADMIN ─────────────────────────────────────────────
-function buildTarifsAdmin(){
-  SD.tarifs.forEach(t=>{if(!t.id)t.id=++tarifIdC;});
-  document.getElementById('tarifs-admin-list').innerHTML=SD.tarifs.map(t=>`
+function removeSoin(id) {
+  if (!confirm('Supprimer ce soin ?')) return;
+  SD.soins = SD.soins.filter(s => s.id !== id);
+  document.getElementById('sac-'+id)?.remove();
+  renderSoins(); syncToCloud(); toast();
+}
+
+async function setSoinPhoto(input, id) {
+  if (!input.files[0]) return;
+  const file = input.files[0];
+  const r = new FileReader();
+  r.onload = e => { const p = document.getElementById('s-pv-'+id); p.src = e.target.result; p.classList.add('show'); };
+  r.readAsDataURL(file);
+  toast('📤 Upload photo…');
+  const url  = await uploadPhotoToStorage(file, 'soin-'+id);
+  const soin = SD.soins.find(s => s.id === id);
+  if (soin) { soin.photo = url || null; buildSoinsAdmin(); toast('✓ Photo sauvegardée !'); }
+}
+
+function clearSoinPhoto(id) { const s = SD.soins.find(x => x.id === id); if (s) s.photo = null; buildSoinsAdmin(); }
+
+function saveSoins() {
+  SD.soins.forEach(s => {
+    const ti = document.getElementById('s-t-'+s.id), ic = document.getElementById('s-i-'+s.id);
+    const de = document.getElementById('s-d-'+s.id), ta = document.getElementById('s-g-'+s.id);
+    if (ti) s.titre = ti.value; if (ic) s.icon  = ic.value;
+    if (de) s.desc  = de.value; if (ta) s.tag   = ta.value;
+  });
+  renderSoins(); syncToCloud();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TARIFS ADMIN
+// ═══════════════════════════════════════════════════════════
+
+function buildTarifsAdmin() {
+  SD.tarifs.forEach(t => { if (!t.id) t.id = ++tarifIdC; });
+  document.getElementById('tarifs-admin-list').innerHTML = SD.tarifs.map(t => `
     <div class="acard" id="tac-${t.id}">
-      <h4><span>${t.titre} ${t.featured?'⭐':''}</span>
+      <h4><span>${t.titre} ${t.featured ? '⭐' : ''}</span>
         <button class="btn-danger" style="font-size:11px;padding:5px 10px" onclick="removeTarif(${t.id})">✕ Supprimer</button>
       </h4>
       <div class="row2">
@@ -1144,155 +1181,148 @@ function buildTarifsAdmin(){
       </div>
       <div class="af"><label>Durée</label><input type="text" id="tf-d-${t.id}" value="${t.duree}"></div>
       <div class="af"><label>Inclusions (une par ligne)</label><textarea id="tf-f-${t.id}">${t.features.join('\n')}</textarea></div>
-      <div class="af"><label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="tf-s-${t.id}" ${t.featured?'checked':''}> Mettre en avant</label></div>
+      <div class="af"><label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="tf-s-${t.id}" ${t.featured ? 'checked' : ''}> Mettre en avant</label></div>
     </div>`).join('');
 }
-function addTarif(){
-  const id=++tarifIdC;SD.tarifs.push({id,titre:'Nouvelle formule',prix:'0',duree:'60 min',features:['Inclure ici'],featured:false});
-  buildTarifsAdmin();document.getElementById('tac-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+function addTarif() {
+  const id = ++tarifIdC;
+  SD.tarifs.push({ id, titre:'Nouvelle formule', prix:'0', duree:'60 min', features:['Inclure ici'], featured:false });
+  buildTarifsAdmin();
+  document.getElementById('tac-'+id)?.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
-function removeTarif(id){
-  if(!confirm('Supprimer cette formule ?'))return;
-  SD.tarifs=SD.tarifs.filter(t=>t.id!==id);buildTarifsAdmin();renderTarifs();syncToCloud();toast();
+
+function removeTarif(id) {
+  if (!confirm('Supprimer cette formule ?')) return;
+  SD.tarifs = SD.tarifs.filter(t => t.id !== id);
+  buildTarifsAdmin(); renderTarifs(); syncToCloud(); toast();
 }
-function saveTarifs(){
-  SD.tarifs_sub=document.getElementById('a-tarifs-sub').value;
-  SD.tarifs.forEach(t=>{
-    const ti=document.getElementById('tf-t-'+t.id),pr=document.getElementById('tf-p-'+t.id),du=document.getElementById('tf-d-'+t.id),fe=document.getElementById('tf-f-'+t.id),st=document.getElementById('tf-s-'+t.id);
-    if(ti)t.titre=ti.value;if(pr)t.prix=pr.value;if(du)t.duree=du.value;
-    if(fe)t.features=fe.value.split('\n').filter(f=>f.trim());if(st)t.featured=st.checked;
+
+function saveTarifs() {
+  SD.tarifs_sub = document.getElementById('a-tarifs-sub').value;
+  SD.tarifs.forEach(t => {
+    const ti = document.getElementById('tf-t-'+t.id), pr = document.getElementById('tf-p-'+t.id);
+    const du = document.getElementById('tf-d-'+t.id), fe = document.getElementById('tf-f-'+t.id);
+    const st = document.getElementById('tf-s-'+t.id);
+    if (ti) t.titre = ti.value; if (pr) t.prix  = pr.value; if (du) t.duree = du.value;
+    if (fe) t.features = fe.value.split('\n').filter(f => f.trim()); if (st) t.featured = st.checked;
   });
-  renderTarifs();syncToCloud();
+  renderTarifs(); syncToCloud();
 }
 
-// ─── SAVES ────────────────────────────────────────────────────
-function saveHero(){
-  SD.hero.title=document.getElementById('a-hero-title').value;
-  SD.hero.desc=document.getElementById('a-hero-desc').value;
-  document.getElementById('hero-title').innerHTML=SD.hero.title;
-  document.getElementById('hero-desc').textContent=SD.hero.desc;
-  syncToCloud();
-}
-async function setAboutPhoto(src){
-  SD.about.photo=src;
-  const frame=document.getElementById('about-frame');
-  frame.innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
-  frame.style.fontSize='0';
-  document.getElementById('about-photo-rm').style.display='inline-block';
-}
-function clearAboutPhoto(){
-  SD.about.photo=null;
-  document.getElementById('about-frame').innerHTML='🌿';
-  document.getElementById('about-frame').style.fontSize='';
-  const p=document.getElementById('about-photo-prev');p.src='';p.classList.remove('show');
-  document.getElementById('about-photo-rm').style.display='none';
-}
-function saveAbout(){
-  SD.about.title=document.getElementById('a-about-title').value;
-  SD.about.p1=document.getElementById('a-about-p1').value;
-  SD.about.p2=document.getElementById('a-about-p2').value;
-  SD.about.sig=document.getElementById('a-about-sig').value;
-  SD.about.annees=document.getElementById('a-about-annees').value||'10+';
-  SD.about.anneesVisible=document.getElementById('a-about-annees-vis').checked;
-  document.getElementById('about-badge').style.display=SD.about.anneesVisible?'block':'none';
-  document.getElementById('about-title').innerHTML=SD.about.title;
-  document.getElementById('about-p1').textContent=SD.about.p1;
-  document.getElementById('about-p2').textContent=SD.about.p2;
-  document.getElementById('about-sig').textContent=SD.about.sig;
-  document.getElementById('about-annees').textContent=SD.about.annees;
-  syncToCloud();
-}
-function saveContact(){
-  const g=id=>document.getElementById(id).value;
-  SD.contact.title=g('a-ct-title');SD.contact.adresse=g('a-ct-adresse');SD.contact.tel=g('a-ct-tel');
-  SD.contact.email=g('a-ct-email');SD.contact.horaires=g('a-ct-horaires');
-  document.getElementById('contact-title').textContent=SD.contact.title;
-  document.getElementById('contact-adresse').textContent=SD.contact.adresse;
-  document.getElementById('contact-tel').textContent=SD.contact.tel;
-  document.getElementById('contact-email').textContent=SD.contact.email;
-  document.getElementById('contact-horaires').textContent=SD.contact.horaires;
+// ═══════════════════════════════════════════════════════════
+//  SAUVEGARDES SECTIONS
+// ═══════════════════════════════════════════════════════════
+
+function saveHero() {
+  SD.hero.title = document.getElementById('a-hero-title').value;
+  SD.hero.desc  = document.getElementById('a-hero-desc').value;
+  document.getElementById('hero-title').innerHTML    = SD.hero.title;
+  document.getElementById('hero-desc').textContent   = SD.hero.desc;
   syncToCloud();
 }
 
-// ─── PHOTO ABOUT (avec upload Storage) ────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{
-  const aboutInput=document.getElementById('about-photo-input');
-  if(aboutInput){
-    aboutInput.addEventListener('change',async function(){
-      if(!this.files[0])return;
-      await handlePhotoWithUpload(this,'about-photo-prev','about-profile',setAboutPhoto);
-    });
-  }
-});
+function setAboutPhoto(src) {
+  SD.about.photo = src;
+  const frame = document.getElementById('about-frame');
+  frame.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
+  frame.style.fontSize = '0';
+  document.getElementById('about-photo-rm').style.display = 'inline-block';
+}
 
-// ─── FORMSPREE ────────────────────────────────────────────────
-async function submitForm(e){
+function clearAboutPhoto() {
+  SD.about.photo = null;
+  document.getElementById('about-frame').innerHTML  = '🌿';
+  document.getElementById('about-frame').style.fontSize = '';
+  const p = document.getElementById('about-photo-prev');
+  p.src = ''; p.classList.remove('show');
+  document.getElementById('about-photo-rm').style.display = 'none';
+}
+
+function saveAbout() {
+  SD.about.title         = document.getElementById('a-about-title').value;
+  SD.about.p1            = document.getElementById('a-about-p1').value;
+  SD.about.p2            = document.getElementById('a-about-p2').value;
+  SD.about.sig           = document.getElementById('a-about-sig').value;
+  SD.about.annees        = document.getElementById('a-about-annees').value || '10+';
+  SD.about.anneesVisible = document.getElementById('a-about-annees-vis').checked;
+  document.getElementById('about-badge').style.display = SD.about.anneesVisible ? 'block' : 'none';
+  document.getElementById('about-title').innerHTML      = SD.about.title;
+  document.getElementById('about-p1').textContent       = SD.about.p1;
+  document.getElementById('about-p2').textContent       = SD.about.p2;
+  document.getElementById('about-sig').textContent      = SD.about.sig;
+  document.getElementById('about-annees').textContent   = SD.about.annees;
+  syncToCloud();
+}
+
+function saveContact() {
+  const g = id => document.getElementById(id).value;
+  SD.contact.title    = g('a-ct-title');    SD.contact.adresse  = g('a-ct-adresse');
+  SD.contact.tel      = g('a-ct-tel');      SD.contact.email    = g('a-ct-email');
+  SD.contact.horaires = g('a-ct-horaires');
+  document.getElementById('contact-title').textContent    = SD.contact.title;
+  document.getElementById('contact-adresse').textContent  = SD.contact.adresse;
+  document.getElementById('contact-tel').textContent      = SD.contact.tel;
+  document.getElementById('contact-email').textContent    = SD.contact.email;
+  document.getElementById('contact-horaires').textContent = SD.contact.horaires;
+  syncToCloud();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FORMULAIRE DE CONTACT (Formspree)
+// ═══════════════════════════════════════════════════════════
+
+async function submitForm(e) {
   e.preventDefault();
-  const btn=document.getElementById('form-btn'),msg=document.getElementById('form-msg');
-  btn.textContent='Envoi en cours…';btn.disabled=true;
-  try{
-    const res=await fetch('https://formspree.io/f/xbdqeqyy',{method:'POST',body:new FormData(e.target),headers:{Accept:'application/json'}});
-    if(res.ok){msg.textContent='✓ Message envoyé ! Je vous répondrai dans les meilleurs délais.';msg.style.color='var(--sage-dark)';msg.style.display='block';e.target.reset();}
-    else throw new Error();
-  }catch(err){
-    msg.textContent="⚠ Erreur lors de l'envoi. Veuillez réessayer.";msg.style.color='var(--danger)';msg.style.display='block';
+  const btn = document.getElementById('form-btn'), msg = document.getElementById('form-msg');
+  btn.textContent = 'Envoi en cours…'; btn.disabled = true;
+  try {
+    const res = await fetch('https://formspree.io/f/xbdqeqyy', { method:'POST', body:new FormData(e.target), headers:{ Accept:'application/json' } });
+    if (res.ok) {
+      msg.textContent = '✓ Message envoyé ! Je vous répondrai dans les meilleurs délais.';
+      msg.style.color = 'var(--sage-dark)'; msg.style.display = 'block'; e.target.reset();
+    } else throw new Error();
+  } catch(err) {
+    msg.textContent = "⚠ Erreur lors de l'envoi. Veuillez réessayer.";
+    msg.style.color = 'var(--danger)'; msg.style.display = 'block';
   }
-  btn.textContent='Envoyer →';btn.disabled=false;
+  btn.textContent = 'Envoyer →'; btn.disabled = false;
 }
 
-// ─── INIT ─────────────────────────────────────────────────────
-async function init(){
-  await checkSession(); // Restaure la session si l'onglet est rechargé
+// ═══════════════════════════════════════════════════════════
+//  INITIALISATION
+// ═══════════════════════════════════════════════════════════
+
+async function init() {
+  // 1. Restaurer la session existante (si l'onglet était déjà ouvert)
+  await checkSession();
+
+  // 2. Charger les données depuis Supabase
   await loadFromCloud();
+
+  // 3. Reconstruire le footer (avec ou sans lien admin selon session)
+  buildFooter();
+
+  // 4. Cacher la bannière de chargement
+  const banner = document.getElementById('loadingBanner');
+  banner.classList.add('hidden');
+  setTimeout(() => banner.style.display = 'none', 600);
+
+  // 5. Gestion du hash dans l'URL
+  //    → yoursite.com/#admin  ouvre l'admin
+  //    → yoursite.com/#soins  ouvre la page soins
+  //    → yoursite.com/        ouvre l'accueil
+  const hash = window.location.hash.replace('#','');
+  if (hash && hash !== 'home') {
+    // Vérifie si c'est une vraie page avant de naviguer
+    const knownPages = ['about','soins','tarifs','contact','admin', ...SD.customPages.map(p=>'cp-'+p.id)];
+    if (knownPages.includes(hash)) {
+      goPage(hash);
+    }
+  }
 }
+
 window.addEventListener('load', init);
-
-/*
-═══════════════════════════════════════════════════════════════
-  INSTRUCTIONS SUPABASE — À FAIRE UNE SEULE FOIS
-  (dans votre tableau de bord sur supabase.com)
-═══════════════════════════════════════════════════════════════
-
-1. CRÉER LA TABLE site_content
-   → SQL Editor → New query → coller et exécuter :
-
-   CREATE TABLE IF NOT EXISTS site_content (
-     id   INT PRIMARY KEY DEFAULT 1,
-     content JSONB NOT NULL DEFAULT '{}'
-   );
-   INSERT INTO site_content (id, content) VALUES (1, '{}') ON CONFLICT DO NOTHING;
-
-2. ACTIVER RLS + POLITIQUES DE SÉCURITÉ
-   → SQL Editor → exécuter :
-
-   ALTER TABLE site_content ENABLE ROW LEVEL SECURITY;
-
-   -- Tout le monde peut LIRE (site public)
-   CREATE POLICY "Lecture publique"
-     ON site_content FOR SELECT USING (true);
-
-   -- Seul un utilisateur connecté peut ÉCRIRE
-   CREATE POLICY "Écriture admin seulement"
-     ON site_content FOR ALL
-     USING (auth.role() = 'authenticated')
-     WITH CHECK (auth.role() = 'authenticated');
-
-3. CRÉER LE BUCKET POUR LES PHOTOS
-   → Storage → New bucket → Nom : "site-photos" → Public : OUI
-   → Policies du bucket → New policy → "Allow authenticated uploads" :
-     INSERT, UPDATE, SELECT pour authenticated users
-     SELECT pour public (anon)
-
-4. CRÉER VOTRE COMPTE ADMIN
-   → Authentication → Users → Add user
-   → Email : votre email  |  Mot de passe : votre choix
-   → Ce sont ces identifiants que vous utilisez dans /admin
-
-5. (OPTIONNEL) RESTREINDRE FORMSPREE À VOTRE DOMAINE
-   → formspree.io → votre formulaire → Settings → Allowed origins
-   → Ajouter : https://votre-site.pages.dev
-═══════════════════════════════════════════════════════════════
-*/
 </script>
 </body>
 </html>
