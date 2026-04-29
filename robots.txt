@@ -1,0 +1,17 @@
+# robots.txt — Nadia Aoussi Sophrologie
+# Indique aux moteurs de recherche quelles pages indexer
+
+User-agent: *
+
+# Pages publiques autorisées à l'indexation
+Allow: /
+Allow: /index.html
+
+# Pages sensibles à ne pas indexer
+Disallow: /admin
+Disallow: /admin/
+Disallow: /_data/
+Disallow: /images/private/
+
+# Sitemap (optionnel — à créer si vous avez un domaine)
+# Sitemap: https://votre-domaine.fr/sitemap.xml
