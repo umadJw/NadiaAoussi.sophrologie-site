@@ -4,34 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nadia Aoussi Sophrologie</title>
-
-<!-- ═══ SÉCURITÉ (meta fallback — les vrais headers sont dans _headers Cloudflare) ═══ -->
-<!-- Content Security Policy : liste blanche stricte de toutes les origines autorisées -->
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src  'self' 'unsafe-inline' https://cdn.jsdelivr.net;
-  style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
-  font-src    'self' https://fonts.gstatic.com;
-  img-src     'self' data: blob: https://czsabcuedgfeqtfakwni.supabase.co;
-  connect-src 'self'
-              https://czsabcuedgfeqtfakwni.supabase.co
-              https://czsabcuedgfeqtfakwni.supabase.in
-              wss://czsabcuedgfeqtfakwni.supabase.co
-              https://formspree.io;
-  frame-src   'none';
-  object-src  'none';
-  base-uri    'self';
-  form-action 'self' https://formspree.io;
-  upgrade-insecure-requests;
-">
-<!-- Empêche le sniffing de type MIME (attaques par fichiers déguisés) -->
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<!-- Refuse d'être affiché dans un iframe (clickjacking) -->
-<meta http-equiv="X-Frame-Options" content="DENY">
-<!-- Ne pas envoyer le Referer complet vers des domaines externes -->
-<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-<!-- Fin sécurité meta -->
-
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--sand:#f5efe6;--sand-dark:#ede4d8;--sage:#7d9b76;--sage-light:#a8bf9e;--sage-dark:#4a6b47;--stone:#8a7d72;--stone-light:#c4b8ae;--cream:#faf7f2;--text:#2d2a27;--text-light:#6b6258;--danger:#c0392b;}
@@ -538,6 +510,9 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <div class="acard">
           <h4>Nouveau mot de passe</h4>
           <p style="font-size:13px;color:var(--text-light);margin-bottom:18px">Le mot de passe est géré par Supabase Authentication (sécurisé côté serveur).</p>
+          <div class="af"><label>Mot de passe actuel</label>
+            <input type="password" id="pwd-current" placeholder="Votre mot de passe actuel" autocomplete="current-password">
+          </div>
           <div class="af"><label>Nouveau mot de passe</label>
             <input type="password" id="pwd-new" placeholder="Minimum 8 caractères" oninput="checkPwdStrength(this.value)">
             <div class="pwd-strength"><div class="pwd-bar" id="pwd-bar"></div></div>
@@ -701,18 +676,41 @@ async function checkSession() {
 }
 
 async function changePassword() {
+  const cur  = document.getElementById('pwd-current') ? document.getElementById('pwd-current').value : '';
   const nw   = document.getElementById('pwd-new').value;
   const conf = document.getElementById('pwd-confirm').value;
   const msg  = document.getElementById('pwd-msg');
-  if (!nw || !conf)  { msg.textContent = 'Remplissez les champs.'; msg.style.color = 'var(--danger)'; return; }
-  if (nw.length < 8) { msg.textContent = '8 caractères minimum.';  msg.style.color = 'var(--danger)'; return; }
+  msg.textContent = '';
+
+  if (!cur)          { msg.textContent = 'Entrez votre mot de passe actuel.'; msg.style.color = 'var(--danger)'; return; }
+  if (!nw || !conf)  { msg.textContent = 'Remplissez tous les champs.';        msg.style.color = 'var(--danger)'; return; }
+  if (nw.length < 8) { msg.textContent = '8 caractères minimum.';              msg.style.color = 'var(--danger)'; return; }
   if (nw !== conf)   { msg.textContent = 'Les mots de passe ne correspondent pas.'; msg.style.color = 'var(--danger)'; return; }
+  if (cur === nw)    { msg.textContent = 'Le nouveau mot de passe doit être différent.'; msg.style.color = 'var(--danger)'; return; }
+
+  msg.textContent = '⏳ Vérification…'; msg.style.color = 'var(--text-light)';
+
+  // 1. Re-authentifier avec le mot de passe actuel pour confirmer l'identité
+  const { error: signInErr } = await sb.auth.signInWithPassword({
+    email: currentUser.email,
+    password: cur
+  });
+  if (signInErr) {
+    msg.textContent = '✕ Mot de passe actuel incorrect.';
+    msg.style.color = 'var(--danger)';
+    document.getElementById('pwd-current').value = '';
+    return;
+  }
+
+  // 2. Changer le mot de passe sur Supabase Auth
   const { error } = await sb.auth.updateUser({ password: nw });
-  if (error) { msg.textContent = 'Erreur : ' + error.message; msg.style.color = 'var(--danger)'; return; }
-  msg.textContent = '✓ Mot de passe mis à jour !'; msg.style.color = 'var(--sage-dark)';
-  ['pwd-new','pwd-confirm'].forEach(id => document.getElementById(id).value = '');
+  if (error) { msg.textContent = 'Erreur Supabase : ' + error.message; msg.style.color = 'var(--danger)'; return; }
+
+  msg.textContent = '✓ Mot de passe mis à jour sur Supabase !'; msg.style.color = 'var(--sage-dark)';
+  ['pwd-current','pwd-new','pwd-confirm'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('pwd-bar').style.width = '0';
   document.getElementById('pwd-hint').textContent = '';
+}
 }
 
 function checkPwdStrength(val) {
