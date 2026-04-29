@@ -655,9 +655,13 @@ async function doLogin() {
 async function doLogout() {
   await sb.auth.signOut();
   currentUser = null;
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginUser').value = '';
+  const errEl = document.getElementById('loginError');
+  if (errEl) errEl.style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('adminDash').classList.remove('active');
-  buildFooter(); // Retire le lien admin du footer
+  buildFooter();
   goPage('home');
 }
 
@@ -847,22 +851,24 @@ async function goPage(page) {
   history.replaceState(null, '', page === 'home' ? '/' : '#' + page);
 
   if (page === 'admin') {
+    // Toujours afficher la page admin — jamais rediriger vers home
+    // Si une session Supabase existe, on connecte automatiquement
     if (!currentUser) {
       const { data } = await sb.auth.getSession();
       if (data.session) { currentUser = data.session.user; }
-      else { goPage('home'); return; } // Redirige si non connecté
     }
-    // Affiche login ou dashboard selon l'état
+    // Affiche le dashboard si connecté, sinon le formulaire de login
     if (currentUser) {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminDash').classList.add('active');
-      document.getElementById('current-username-display').textContent = currentUser.email;
+      if (document.getElementById('current-username-display')) {
+        document.getElementById('current-username-display').textContent = currentUser.email;
+      }
       loadAdminFields();
     } else {
       document.getElementById('loginScreen').style.display = 'flex';
       document.getElementById('adminDash').classList.remove('active');
     }
-    buildFooter();
     return;
   }
   if (page === 'soins')  renderSoins();
