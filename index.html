@@ -762,9 +762,57 @@ async function syncToCloud() {
   else { toast('✓ Sauvegardé !'); }
 }
 
+
+// ═══════════════════════════════════════════════════════════
+//  APPLIQUE LES DONNÉES SD AU DOM PUBLIC
+//  Appelé après chaque chargement cloud pour mettre à jour
+//  toutes les pages visibles (hero, about, contact…)
+// ═══════════════════════════════════════════════════════════
+function applySDtoDOM() {
+  // ── Hero
+  const heroTitle = document.getElementById('hero-title');
+  const heroDesc  = document.getElementById('hero-desc');
+  if (heroTitle) heroTitle.innerHTML  = SD.hero.title || '';
+  if (heroDesc)  heroDesc.textContent = SD.hero.desc  || '';
+
+  // ── À propos
+  const aboutTitle = document.getElementById('about-title');
+  const aboutP1    = document.getElementById('about-p1');
+  const aboutP2    = document.getElementById('about-p2');
+  const aboutSig   = document.getElementById('about-sig');
+  const aboutAnnees= document.getElementById('about-annees');
+  const aboutBadge = document.getElementById('about-badge');
+  if (aboutTitle)  aboutTitle.innerHTML    = SD.about.title || '';
+  if (aboutP1)     aboutP1.textContent     = SD.about.p1    || '';
+  if (aboutP2)     aboutP2.textContent     = SD.about.p2    || '';
+  if (aboutSig)    aboutSig.textContent    = SD.about.sig   || '';
+  if (aboutAnnees) aboutAnnees.textContent = SD.about.annees|| '10+';
+  if (aboutBadge)  aboutBadge.style.display = SD.about.anneesVisible !== false ? 'block' : 'none';
+  // Photo de profil
+  if (SD.about.photo) {
+    const frame = document.getElementById('about-frame');
+    if (frame) {
+      frame.innerHTML  = `<img src="${SD.about.photo}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
+      frame.style.fontSize = '0';
+    }
+  }
+
+  // ── Contact
+  const ctTitle    = document.getElementById('contact-title');
+  const ctAdresse  = document.getElementById('contact-adresse');
+  const ctTel      = document.getElementById('contact-tel');
+  const ctEmail    = document.getElementById('contact-email');
+  const ctHoraires = document.getElementById('contact-horaires');
+  if (ctTitle)    ctTitle.textContent    = SD.contact.title    || '';
+  if (ctAdresse)  ctAdresse.textContent  = SD.contact.adresse  || '';
+  if (ctTel)      ctTel.textContent      = SD.contact.tel      || '';
+  if (ctEmail)    ctEmail.textContent    = SD.contact.email    || '';
+  if (ctHoraires) ctHoraires.textContent = SD.contact.horaires || '';
+}
+
 async function loadFromCloud() {
   // Affichage immédiat avec valeurs par défaut
-  buildNav(); renderSoins(); renderTarifs(); rebuildCustom();
+  buildNav(); renderSoins(); renderTarifs(); rebuildCustom(); applySDtoDOM();
 
   try {
     const { data, error } = await sb.from('site_content').select('content').eq('id', 1).maybeSingle();
@@ -777,7 +825,7 @@ async function loadFromCloud() {
       SD = Object.assign({}, SD, cloud);
       SD.navVisible = safeVis;
       SD.navLabels  = safeLbl;
-      buildNav(); renderSoins(); renderTarifs(); rebuildCustom();
+      buildNav(); renderSoins(); renderTarifs(); rebuildCustom(); applySDtoDOM();
     }
   } catch(e) {
     console.warn('loadFromCloud échoué:', e);
