@@ -921,7 +921,7 @@ function buildCustomAdminPanels(){
 }
 function updatePagesList(){
   const l=document.getElementById('pages-list');
-  if(!SD.customPages.length){l.innerHTML='<p style="color:var(--text-light);font-size:14px">Aucune page pour l'instant.</p>';return;}
+  if(!SD.customPages.length){l.innerHTML='<p style="color:var(--text-light);font-size:14px">Aucune page pour l\'instant.</p>';return;}
   l.innerHTML=SD.customPages.map(p=>`
     <div class="page-list-item">
       <div class="pli-info"><div class="name">${p.navTitle}</div><div class="slug">${p.heading}</div></div>
