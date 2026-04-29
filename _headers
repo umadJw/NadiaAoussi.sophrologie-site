@@ -1,0 +1,49 @@
+/*
+  # ═══════════════════════════════════════════════════════════
+  # HEADERS DE SÉCURITÉ — Cloudflare Pages
+  # Ce fichier doit être placé à la RACINE de votre dépôt GitHub
+  # Cloudflare Pages le lit automatiquement à chaque déploiement
+  # ═══════════════════════════════════════════════════════════
+
+  # ── Content Security Policy ──────────────────────────────────
+  # Liste blanche stricte : seules ces origines sont autorisées.
+  # Si vous ajoutez une ressource externe dans index.html,
+  # il faut l'ajouter ici aussi, sinon le navigateur la bloquera.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://czsabcuedgfeqtfakwni.supabase.co; connect-src 'self' https://czsabcuedgfeqtfakwni.supabase.co https://czsabcuedgfeqtfakwni.supabase.in wss://czsabcuedgfeqtfakwni.supabase.co https://formspree.io; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io; upgrade-insecure-requests
+
+  # ── Anti-sniffing MIME ───────────────────────────────────────
+  # Empêche le navigateur de deviner le type d'un fichier.
+  # Protège contre les fichiers malveillants déguisés en images, etc.
+  X-Content-Type-Options: nosniff
+
+  # ── Anti-clickjacking ────────────────────────────────────────
+  # Empêche votre site d'être affiché dans un <iframe> sur un autre site.
+  # Un attaquant ne peut pas superposer votre page sur la sienne.
+  X-Frame-Options: DENY
+
+  # ── Referrer Policy ──────────────────────────────────────────
+  # Envoie uniquement l'origine (pas le chemin complet) vers l'extérieur.
+  # Protège les URLs internes si elles contiennent des données sensibles.
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # ── Permissions Policy ───────────────────────────────────────
+  # Désactive les APIs navigateur inutiles pour ce site.
+  # Un script malveillant injecté ne pourra pas accéder à la caméra, micro, etc.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=()
+
+  # ── HSTS (HTTP Strict Transport Security) ────────────────────
+  # Force HTTPS pour 1 an. Après la première visite, le navigateur
+  # refusera toute connexion HTTP non chiffrée vers votre site.
+  # ⚠ N'activez includeSubDomains que si TOUS vos sous-domaines sont en HTTPS
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+  # ── XSS Protection (legacy) ──────────────────────────────────
+  # Pour les vieux navigateurs qui ne comprennent pas CSP.
+  # Les navigateurs modernes l'ignorent (CSP suffit).
+  X-XSS-Protection: 1; mode=block
+
+  # ── Cross-Origin policies ────────────────────────────────────
+  # Empêche d'autres sites de lire les réponses de votre serveur
+  # via des requêtes cross-origin (protection Spectre/side-channel).
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: same-origin
