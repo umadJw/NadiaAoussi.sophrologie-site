@@ -1236,6 +1236,15 @@ function buildTarifsAdmin() {
 }
 
 function addTarif() {
+  // 1. Sauvegarder les valeurs actuelles des champs avant rebuild
+  SD.tarifs.forEach(t => {
+    const ti=document.getElementById('tf-t-'+t.id), pr=document.getElementById('tf-p-'+t.id);
+    const du=document.getElementById('tf-d-'+t.id), fe=document.getElementById('tf-f-'+t.id);
+    const st=document.getElementById('tf-s-'+t.id);
+    if(ti)t.titre=ti.value; if(pr)t.prix=pr.value; if(du)t.duree=du.value;
+    if(fe)t.features=fe.value.split('\n').filter(f=>f.trim()); if(st)t.featured=st.checked;
+  });
+  // 2. Ajouter la nouvelle formule vierge
   const id = ++tarifIdC;
   SD.tarifs.push({ id, titre:'Nouvelle formule', prix:'0', duree:'60 min', features:['Inclure ici'], featured:false });
   buildTarifsAdmin();
