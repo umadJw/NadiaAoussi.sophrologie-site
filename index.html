@@ -825,6 +825,7 @@ async function loadFromCloud() {
       SD = Object.assign({}, SD, cloud);
       SD.navVisible = safeVis;
       SD.navLabels  = safeLbl;
+      syncIdCounters(); // ← évite les collisions d'IDs après chargement Supabase
       buildNav(); renderSoins(); renderTarifs(); rebuildCustom(); applySDtoDOM();
     }
   } catch(e) {
@@ -1217,6 +1218,12 @@ function saveSoins() {
 // ═══════════════════════════════════════════════════════════
 //  TARIFS ADMIN
 // ═══════════════════════════════════════════════════════════
+
+function syncIdCounters() {
+  if (SD.tarifs.length)      tarifIdC = Math.max(tarifIdC, ...SD.tarifs.map(t => t.id || 0));
+  if (SD.soins.length)       soinIdC  = Math.max(soinIdC,  ...SD.soins.map(s => s.id  || 0));
+  if (SD.customPages.length) pageIdC  = Math.max(pageIdC,  ...SD.customPages.map(p => p.id || 0));
+}
 
 function buildTarifsAdmin() {
   SD.tarifs.forEach(t => { if (!t.id) t.id = ++tarifIdC; });
