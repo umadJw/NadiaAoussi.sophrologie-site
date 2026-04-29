@@ -820,15 +820,11 @@ function buildFooter() {
     a.onclick = () => goPage('cp-' + p.id);
     fl.appendChild(a);
   });
-  // Lien admin : quasi invisible, visible seulement si connecté
-  if (currentUser) {
-    const adm = document.createElement('a');
-    adm.textContent = '·';
-    adm.className = 'admin-link';
-    adm.title = 'Administration';
-    adm.onclick = () => goPage('admin');
-    fl.appendChild(adm);
-  }
+  // Bouton admin toujours visible
+  const adm = document.createElement('a');
+  adm.textContent = '⚙ Admin';
+  adm.onclick = () => goPage('admin');
+  fl.appendChild(adm);
 }
 
 function markActiveNav() {
