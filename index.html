@@ -1660,194 +1660,188 @@ async function init() {
 window.addEventListener('load', init);
 
 // ═══════════════════════════════════════════════════════════
-//  DRAG & DROP FLUIDE — POINTER EVENTS (souris + touch)
-//  Pas de HTML5 drag API (trop limité) → on gère tout manuellement
+//  DRAG & DROP — COMPATIBLE iOS SAFARI + DESKTOP
+//  Touch Events pour mobile, Pointer Events pour desktop
 // ═══════════════════════════════════════════════════════════
 
 (function() {
-  // ── État global du drag ──────────────────────────────────
-  let ghost      = null;   // clone visuel qui suit le curseur
-  let dragCard   = null;   // card originale en cours de déplacement
-  let container  = null;   // liste parent
-  let dataArray  = null;   // SD.soins ou SD.tarifs
-  let saveFunc   = null;   // callback après drop
-  let placeholder= null;   // div fantôme qui montre où la card va se poser
-  let startY     = 0;
-  let offsetY    = 0;      // décalage curseur/coin haut de la card
-  let scrollRAF  = null;   // requestAnimationFrame pour auto-scroll
-  const SCROLL_ZONE = 80;  // px depuis le bord haut/bas pour déclencher le scroll
-  const SCROLL_SPEED = 10; // px par frame
+  let ghost       = null;
+  let dragCard    = null;
+  let container   = null;
+  let dataArray   = null;
+  let saveFunc    = null;
+  let placeholder = null;
+  let offsetY     = 0;
+  let isDragging  = false;
+  let scrollRAF   = null;
+  const SCROLL_ZONE  = 100;
+  const SCROLL_SPEED = 14;
 
-  // ── Crée le placeholder (ligne bleue animée) ─────────────
   function makePlaceholder(height) {
     const p = document.createElement('div');
-    p.style.cssText = `height:${height}px;border-radius:12px;background:rgba(125,155,118,.15);
-      border:2px dashed var(--sage-light);margin-bottom:12px;
-      transition:all .15s ease;pointer-events:none;`;
+    p.style.cssText = `height:${height}px;border-radius:12px;
+      background:rgba(125,155,118,.15);border:2px dashed var(--sage-light);
+      margin-bottom:12px;pointer-events:none;box-sizing:border-box;`;
     return p;
   }
 
-  // ── Crée le ghost (clone semi-transparent qui suit la souris) ─
   function makeGhost(card) {
     const g = card.cloneNode(true);
     const r = card.getBoundingClientRect();
-    g.style.cssText = `
-      position:fixed;top:${r.top}px;left:${r.left}px;
-      width:${r.width}px;opacity:.85;pointer-events:none;z-index:9999;
-      box-shadow:0 16px 48px rgba(0,0,0,.18);border-radius:14px;
-      transform:rotate(1.2deg) scale(1.02);
-      transition:transform .15s ease,box-shadow .15s ease;`;
+    g.style.cssText = `position:fixed;top:${r.top}px;left:${r.left}px;
+      width:${r.width}px;opacity:.82;pointer-events:none;z-index:9999;
+      box-shadow:0 20px 56px rgba(0,0,0,.22);border-radius:14px;
+      transform:rotate(1.5deg) scale(1.02);`;
     document.body.appendChild(g);
     return g;
   }
 
-  // ── Auto-scroll pendant le drag ──────────────────────────
   function autoScroll(clientY) {
     cancelAnimationFrame(scrollRAF);
     const winH = window.innerHeight;
     if (clientY < SCROLL_ZONE) {
-      // Scroll vers le haut
-      scrollRAF = requestAnimationFrame(() => {
-        window.scrollBy(0, -SCROLL_SPEED * (1 - clientY / SCROLL_ZONE));
-        autoScroll(clientY);
-      });
+      const speed = SCROLL_SPEED * (1 - clientY / SCROLL_ZONE);
+      scrollRAF = requestAnimationFrame(() => { window.scrollBy(0, -speed); autoScroll(clientY); });
     } else if (clientY > winH - SCROLL_ZONE) {
-      // Scroll vers le bas
-      scrollRAF = requestAnimationFrame(() => {
-        window.scrollBy(0, SCROLL_SPEED * ((clientY - (winH - SCROLL_ZONE)) / SCROLL_ZONE));
-        autoScroll(clientY);
-      });
+      const speed = SCROLL_SPEED * ((clientY - (winH - SCROLL_ZONE)) / SCROLL_ZONE);
+      scrollRAF = requestAnimationFrame(() => { window.scrollBy(0, speed); autoScroll(clientY); });
     }
   }
 
-  // ── Trouve où insérer le placeholder selon la position Y ─
   function getDropTarget(clientY) {
-    const cards = [...container.querySelectorAll('.drag-item')].filter(c => c !== placeholder && c !== dragCard);
+    const cards = [...container.querySelectorAll('.drag-item')]
+      .filter(c => c !== placeholder && c !== dragCard);
     for (const c of cards) {
       const r = c.getBoundingClientRect();
-      if (clientY < r.top + r.height / 2) return { before: c };
+      if (clientY < r.top + r.height / 2) return c;
     }
-    return { before: null }; // insérer à la fin
+    return null;
   }
 
-  // ── pointermove ──────────────────────────────────────────
-  function onMove(e) {
-    if (!ghost) return;
-    const clientY = e.clientY ?? e.touches?.[0]?.clientY;
-    if (clientY == null) return;
-    e.preventDefault();
-
-    // Déplacer le ghost
+  function onDragMove(clientY) {
+    if (!isDragging || !ghost) return;
     ghost.style.top = (clientY - offsetY) + 'px';
-
-    // Auto-scroll
     autoScroll(clientY);
-
-    // Repositionner le placeholder
-    const { before } = getDropTarget(clientY);
-    if (before) {
-      container.insertBefore(placeholder, before);
-    } else {
-      container.appendChild(placeholder);
-    }
+    const target = getDropTarget(clientY);
+    if (target) container.insertBefore(placeholder, target);
+    else container.appendChild(placeholder);
   }
 
-  // ── pointerup / fin du drag ──────────────────────────────
-  function onUp(e) {
-    if (!ghost) return;
+  function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
     cancelAnimationFrame(scrollRAF);
+    if (navigator.vibrate) navigator.vibrate([6, 30, 6]);
 
-    // Feedback haptique au drop
-    if (navigator.vibrate) navigator.vibrate([8, 40, 8]);
-
-    // Supprimer le ghost proprement
-    if (ghost && ghost.parentNode) ghost.remove();
-    ghost = null;
-
-    // Remettre la card à la place du placeholder, restaurer son style
-    if (dragCard) {
-      dragCard.style.opacity = '';
-      dragCard.style.pointerEvents = '';
-      if (placeholder && placeholder.parentNode) {
-        container.insertBefore(dragCard, placeholder);
-      }
-    }
-    if (placeholder && placeholder.parentNode) placeholder.remove();
-    placeholder = null;
-
-    // Relire l'ordre DOM → mettre à jour dataArray
+    // Lire l'ordre avant cleanup
     const newOrder = [];
     if (container) {
       container.querySelectorAll('.drag-item').forEach(c => {
+        if (c === placeholder) return;
         const id = parseInt(c.dataset.id);
         const item = dataArray.find(x => x.id === id);
         if (item) newOrder.push(item);
       });
-      if (newOrder.length === dataArray.length) {
-        dataArray.length = 0;
-        newOrder.forEach(x => dataArray.push(x));
-        saveFunc();
-      }
     }
+    const arr = dataArray, fn = saveFunc;
 
-    dragCard = null; container = null;
-    window.removeEventListener('pointermove', onMove);
-    window.removeEventListener('pointerup', onUp);
-    window.removeEventListener('touchmove', onMove, { passive: false });
-    window.removeEventListener('touchend', onUp);
-    window.removeEventListener('touchcancel', onUp);
+    // Cleanup
+    if (ghost) { ghost.remove(); ghost = null; }
+    if (dragCard) {
+      dragCard.style.opacity = '';
+      dragCard.style.pointerEvents = '';
+      if (placeholder && placeholder.parentNode)
+        container.insertBefore(dragCard, placeholder);
+      dragCard = null;
+    }
+    if (placeholder) { placeholder.remove(); placeholder = null; }
+    container = null;
+
+    // Sauvegarder
+    if (newOrder.length && arr && newOrder.length === arr.length) {
+      arr.length = 0; newOrder.forEach(x => arr.push(x)); fn();
+    }
   }
 
-  // ── Démarre le drag depuis une poignée ───────────────────
-  function startDrag(e, card, cont, arr, save) {
-    if (e.button !== undefined && e.button !== 0) return; // clic gauche seulement
-    e.preventDefault();
-    e.stopPropagation();
+  // ── TOUCH HANDLERS (iOS Safari) ──────────────────────────
+  function onTouchMove(e) {
+    if (!isDragging) return;
+    e.preventDefault(); // bloque scroll SEULEMENT pendant drag actif
+    onDragMove(e.touches[0].clientY);
+  }
+  function onTouchEnd() {
+    document.removeEventListener('touchmove', onTouchMove);
+    document.removeEventListener('touchend', onTouchEnd);
+    document.removeEventListener('touchcancel', onTouchEnd);
+    onDragEnd();
+  }
 
-    // Feedback haptique au début du drag (ignoré si non supporté)
-    if (navigator.vibrate) navigator.vibrate(12);
+  // ── MOUSE HANDLERS (desktop) ─────────────────────────────
+  function onMouseMove(e) { onDragMove(e.clientY); }
+  function onMouseUp() {
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    onDragEnd();
+  }
 
-    const clientY = e.clientY ?? e.touches?.[0]?.clientY;
+  function startDrag(e, isTouchEvent, card, cont, arr, save) {
+    if (isDragging) return; // évite double-fire
+    if (!isTouchEvent && e.button !== 0) return;
+
+    const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
+
+    if (navigator.vibrate) navigator.vibrate(14);
+
     const r = card.getBoundingClientRect();
     offsetY   = clientY - r.top;
-    startY    = clientY;
     dragCard  = card;
     container = cont;
     dataArray = arr;
     saveFunc  = save;
+    isDragging = true;
 
-    // Masquer la card originale sur place
-    card.style.opacity = '0.35';
+    card.style.opacity = '0.3';
     card.style.pointerEvents = 'none';
 
-    // Créer placeholder de même hauteur
     placeholder = makePlaceholder(r.height);
     container.insertBefore(placeholder, card.nextSibling);
-
-    // Créer le ghost
     ghost = makeGhost(card);
 
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onUp);
-    window.addEventListener('touchcancel', onUp);
+    if (isTouchEvent) {
+      // Touch : addEventListener sur document avec passive:false pour pouvoir preventDefault
+      document.addEventListener('touchmove', onTouchMove, { passive: false });
+      document.addEventListener('touchend', onTouchEnd);
+      document.addEventListener('touchcancel', onTouchEnd);
+    } else {
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
   }
 
-  // ── API publique : initialiser le drag sur un container ──
   window.initDragDrop = function(containerId, arr, save) {
     const cont = document.getElementById(containerId);
     if (!cont) return;
     cont.querySelectorAll('.drag-item').forEach(card => {
       const handle = card.querySelector('.drag-handle');
       if (!handle) return;
-      // Supprimer les anciens listeners en remplaçant le nœud handle
       const h2 = handle.cloneNode(true);
       handle.parentNode.replaceChild(h2, handle);
-      h2.addEventListener('pointerdown', e => startDrag(e, card, cont, arr, save));
-      h2.addEventListener('touchstart',  e => startDrag(e, card, cont, arr, save), { passive: false });
+      // touch-action none sur la poignée pour débloquer touchstart
+      h2.style.touchAction = 'none';
+      h2.style.userSelect  = 'none';
+      // Touch (iOS Safari)
+      h2.addEventListener('touchstart', e => {
+        e.stopPropagation();
+        startDrag(e, true, card, cont, arr, save);
+      }, { passive: true });
+      // Mouse (desktop)
+      h2.addEventListener('mousedown', e => {
+        e.preventDefault();
+        startDrag(e, false, card, cont, arr, save);
+      });
     });
   };
+
 })();
 
 function activeDragSoins() {
