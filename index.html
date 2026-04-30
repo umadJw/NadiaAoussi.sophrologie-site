@@ -9,8 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://czsabcuedgfeqtfakwni.supabase.co" crossorigin>
-<!-- Fonts : display=swap affiche le texte immédiatement avec la font système, puis swap -->
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Fonts chargées en asynchrone : ne bloque plus le rendu -->
+<link rel="preload" as="style"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap"
+  onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+</noscript>
 <style>
 :root{--sand:#f5efe6;--sand-dark:#ede4d8;--sage:#7d9b76;--sage-light:#a8bf9e;--sage-dark:#4a6b47;--stone:#8a7d72;--stone-light:#c4b8ae;--cream:#faf7f2;--text:#2d2a27;--text-light:#6b6258;--danger:#c0392b;}
 *{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
@@ -1797,14 +1802,20 @@ window.addEventListener('load', () => {
   }
 
   function startDrag(e, isTouchEvent, card, cont, arr, save) {
-    if (isDragging) return; // évite double-fire
+    if (isDragging) return;
     if (!isTouchEvent && e.button !== 0) return;
 
     const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
 
     if (navigator.vibrate) navigator.vibrate(14);
 
+    // Lire les dimensions AVANT toute mutation DOM (évite le forced reflow)
     const r = card.getBoundingClientRect();
+    const ghostTop  = r.top;
+    const ghostLeft = r.left;
+    const ghostW    = r.width;
+    const ghostH    = r.height;
+
     offsetY   = clientY - r.top;
     dragCard  = card;
     container = cont;
@@ -1815,9 +1826,17 @@ window.addEventListener('load', () => {
     card.style.opacity = '0.3';
     card.style.pointerEvents = 'none';
 
-    placeholder = makePlaceholder(r.height);
+    placeholder = makePlaceholder(ghostH);
     container.insertBefore(placeholder, card.nextSibling);
-    ghost = makeGhost(card);
+
+    // Créer le ghost avec les dimensions déjà lues (pas de nouveau reflow)
+    const g = card.cloneNode(true);
+    g.style.cssText = `position:fixed;top:${ghostTop}px;left:${ghostLeft}px;
+      width:${ghostW}px;opacity:.82;pointer-events:none;z-index:9999;
+      box-shadow:0 20px 56px rgba(0,0,0,.22);border-radius:14px;
+      transform:rotate(1.5deg) scale(1.02);`;
+    document.body.appendChild(g);
+    ghost = g;
 
     if (isTouchEvent) {
       // Touch : addEventListener sur document avec passive:false pour pouvoir preventDefault
