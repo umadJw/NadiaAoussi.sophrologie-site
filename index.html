@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nadia Aoussi Sophrologie</title>
+<!-- Préconnexions : établit les connexions DNS avant que le navigateur en ait besoin -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://czsabcuedgfeqtfakwni.supabase.co" crossorigin>
+<!-- Fonts : display=swap affiche le texte immédiatement avec la font système, puis swap -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--sand:#f5efe6;--sand-dark:#ede4d8;--sage:#7d9b76;--sage-light:#a8bf9e;--sage-dark:#4a6b47;--stone:#8a7d72;--stone-light:#c4b8ae;--cream:#faf7f2;--text:#2d2a27;--text-light:#6b6258;--danger:#c0392b;}
@@ -281,7 +287,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
   .mobile-menu{display:block;}
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body>
 
@@ -1657,7 +1663,13 @@ async function init() {
   }
 }
 
-window.addEventListener('load', init);
+window.addEventListener('load', () => {
+  // Sécurité : s'assurer que la lib Supabase est bien chargée (defer)
+  if (typeof window.supabase === 'undefined') {
+    console.error('Supabase non chargé'); return;
+  }
+  init();
+});
 
 // ═══════════════════════════════════════════════════════════
 //  DRAG & DROP — COMPATIBLE iOS SAFARI + DESKTOP
