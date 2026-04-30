@@ -182,6 +182,12 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 .upload-preview{width:100%;height:130px;object-fit:cover;border-radius:8px;margin-top:10px;display:none;}
 .upload-preview.show{display:block;}
 .remove-photo{font-size:11px;color:var(--danger);cursor:pointer;margin-top:6px;display:inline-block;background:none;border:none;font-family:'Jost',sans-serif;}
+/* ── Barre de progression compression ── */
+.compress-bar-wrap{display:none;margin-top:10px;background:#eee;border-radius:20px;height:5px;overflow:hidden;}
+.compress-bar-wrap.show{display:block;}
+.compress-bar{height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--sage-light),var(--sage-dark));transition:width .25s ease;}
+.compress-info{font-size:11px;color:var(--text-light);text-align:center;margin-top:5px;display:none;}
+.compress-info.show{display:block;}
 
 /* Soin admin card */
 .sac{background:#fff;border-radius:12px;border:1px solid #eee;margin-bottom:12px;overflow:hidden;}
@@ -407,7 +413,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
         <h2>Page À propos</h2>
         <div class="acard"><h4>Photo de profil</h4>
           <div class="upload-zone">
-            <input type="file" id="about-photo-file" accept="image/*" onchange="setSinglePhoto(this,'about-photo-prev','about-profile',setAboutPhoto)">
+            <input type="file" id="about-photo-file" accept="image/*" onchange="setSinglePhoto(this,'about-photo-prev','about-profile',setAboutPhoto,{maxW:800,maxH:800})">
             <p class="upload-lbl">📷 Cliquez pour uploader votre photo</p>
             <img id="about-photo-prev" class="upload-preview" src="" alt="">
           </div>
@@ -733,49 +739,152 @@ function checkPwdStrength(val) {
 //  SUPABASE STORAGE — UPLOAD PHOTOS
 // ═══════════════════════════════════════════════════════════
 
-async function uploadPhotoToStorage(file, path) {
+// ═══════════════════════════════════════════════════════════
+//  COMPRESSION CANVAS — WebP centré, redimensionné côté navigateur
+//  maxW/maxH : dimensions max en pixels
+//  quality   : 0–1 (0.82 = très bon rapport qualité/taille)
+//  Retourne un Blob WebP (ou JPEG en fallback Safari < 16)
+// ═══════════════════════════════════════════════════════════
+
+async function compressImage(file, { maxW = 1200, maxH = 1200, quality = 0.82 } = {}) {
+  // createImageBitmap : décode le fichier en mémoire GPU sans passer par le DOM
+  const bmp = await createImageBitmap(file);
+  const { width: sw, height: sh } = bmp;
+
+  // Calcul du ratio pour tenir dans maxW × maxH
+  const ratio = Math.min(1, maxW / sw, maxH / sh);
+  const dw = Math.round(sw * ratio);
+  const dh = Math.round(sh * ratio);
+
+  // Canvas offscreen (pas de rendu à l'écran → plus rapide)
+  const canvas = new OffscreenCanvas(dw, dh);
+  const ctx    = canvas.getContext('2d');
+
+  // Dessin centré (object-fit: cover) — on crop au centre si le ratio change
+  const scale  = Math.max(dw / sw, dh / sh);
+  const drawW  = sw * scale;
+  const drawH  = sh * scale;
+  const ox     = (dw - drawW) / 2;
+  const oy     = (dh - drawH) / 2;
+  ctx.drawImage(bmp, ox, oy, drawW, drawH);
+  bmp.close();
+
+  // Tenter WebP, sinon JPEG (Safari ≤ 15)
+  let blob = await canvas.convertToBlob({ type: 'image/webp', quality });
+  if (!blob || blob.size === 0) {
+    blob = await canvas.convertToBlob({ type: 'image/jpeg', quality });
+  }
+  return blob;
+}
+
+// Affiche la progression dans la zone d'upload (barre + info taille)
+function showCompressProgress(zoneEl, pct, origKB, finalKB) {
+  let wrap = zoneEl.querySelector('.compress-bar-wrap');
+  let info = zoneEl.querySelector('.compress-info');
+  if (!wrap) {
+    wrap = document.createElement('div'); wrap.className = 'compress-bar-wrap';
+    wrap.innerHTML = '<div class="compress-bar"></div>';
+    zoneEl.appendChild(wrap);
+  }
+  if (!info) {
+    info = document.createElement('div'); info.className = 'compress-info';
+    zoneEl.appendChild(info);
+  }
+  wrap.classList.add('show');
+  wrap.querySelector('.compress-bar').style.width = pct + '%';
+  if (finalKB) {
+    info.classList.add('show');
+    const saving = Math.round((1 - finalKB / origKB) * 100);
+    info.textContent = `${origKB} Ko → ${finalKB} Ko · ${saving}% de gain`;
+  }
+}
+function hideCompressProgress(zoneEl) {
+  const wrap = zoneEl.querySelector('.compress-bar-wrap');
+  const info = zoneEl.querySelector('.compress-info');
+  if (wrap) wrap.classList.remove('show');
+  if (info) info.classList.remove('show');
+}
+
+// ── Upload vers Supabase Storage ─────────────────────────
+async function uploadPhotoToStorage(blob, path, origName) {
   if (!currentUser) { toast('⚠ Connectez-vous pour uploader'); return null; }
-  const ext = file.name.split('.').pop().toLowerCase();
+  const ext      = blob.type === 'image/webp' ? 'webp' : 'jpg';
   const fileName = path + '_' + Date.now() + '.' + ext;
-  const { error } = await sb.storage.from('site-photos').upload(fileName, file, { upsert: true, contentType: file.type });
+  const { error } = await sb.storage.from('site-photos').upload(fileName, blob, { upsert: true, contentType: blob.type });
   if (error) { console.error('Upload error:', error); toast('⚠ Erreur upload photo'); return null; }
   const { data: urlData } = sb.storage.from('site-photos').getPublicUrl(fileName);
   return urlData.publicUrl;
 }
 
-// Upload avec prévisualisation + envoi Storage
-async function setSinglePhoto(input, previewId, storageKey, callback) {
+// ── setSinglePhoto : compression + preview + Storage ─────
+//  maxW / maxH : limites de redimensionnement (profil = 800, cover = 1200)
+async function setSinglePhoto(input, previewId, storageKey, callback, { maxW = 1200, maxH = 1200 } = {}) {
   if (!input.files[0]) return;
-  const file = input.files[0];
-  // Preview immédiate
-  const r = new FileReader();
-  r.onload = e => {
-    const prev = document.getElementById(previewId);
-    if (prev) { prev.src = e.target.result; prev.classList.add('show'); }
-  };
-  r.readAsDataURL(file);
-  // Upload Supabase Storage
+  const file   = input.files[0];
+  const origKB = Math.round(file.size / 1024);
+  const zone   = input.closest('.upload-zone');
+
+  // Feedback haptique mobile
+  if (navigator.vibrate) navigator.vibrate(10);
+
+  showCompressProgress(zone, 20, origKB, null);
+
+  let blob;
+  try {
+    blob = await compressImage(file, { maxW, maxH, quality: 0.82 });
+  } catch(e) {
+    console.warn('Compression échouée, utilisation du fichier original', e);
+    blob = file;
+  }
+
+  const finalKB = Math.round(blob.size / 1024);
+  showCompressProgress(zone, 70, origKB, finalKB);
+
+  // Prévisualisation immédiate depuis le blob compressé
+  const blobUrl = URL.createObjectURL(blob);
+  const prev    = document.getElementById(previewId);
+  if (prev) { prev.src = blobUrl; prev.classList.add('show'); }
+
+  showCompressProgress(zone, 90, origKB, finalKB);
   toast('📤 Upload en cours…');
-  const publicUrl = await uploadPhotoToStorage(file, storageKey);
+
+  const publicUrl = await uploadPhotoToStorage(blob, storageKey, file.name);
+  showCompressProgress(zone, 100, origKB, finalKB);
+  setTimeout(() => hideCompressProgress(zone), 3000);
+
   if (publicUrl && callback) { callback(publicUrl); toast('✓ Photo sauvegardée !'); }
   else if (!publicUrl) {
-    // Fallback base64 si storage pas encore configuré
-    const r2 = new FileReader();
-    r2.onload = e => { if (callback) callback(e.target.result); };
-    r2.readAsDataURL(file);
+    // Fallback base64 si Supabase Storage pas configuré
+    const r = new FileReader(); r.onload = e => { if (callback) callback(e.target.result); }; r.readAsDataURL(blob);
   }
 }
 
-// handlePhoto simple (preview + callback base64, pas de Storage)
-function handlePhoto(input, previewId, callback) {
+// ── handlePhoto : compression + preview (sans Storage) ───
+//  Utilisé pour les pages custom dans la modal
+async function handlePhoto(input, previewId, callback) {
   if (!input.files[0]) return;
-  const r = new FileReader();
-  r.onload = e => {
-    const prev = document.getElementById(previewId);
-    if (prev) { prev.src = e.target.result; prev.classList.add('show'); }
-    if (callback) callback(e.target.result);
-  };
-  r.readAsDataURL(input.files[0]);
+  const file   = input.files[0];
+  const origKB = Math.round(file.size / 1024);
+  const zone   = input.closest('.upload-zone');
+
+  if (navigator.vibrate) navigator.vibrate(10);
+  showCompressProgress(zone, 30, origKB, null);
+
+  let blob;
+  try { blob = await compressImage(file, { maxW: 1200, maxH: 1200, quality: 0.82 }); }
+  catch(e) { blob = file; }
+
+  const finalKB = Math.round(blob.size / 1024);
+  showCompressProgress(zone, 100, origKB, finalKB);
+  setTimeout(() => hideCompressProgress(zone), 3000);
+
+  const blobUrl = URL.createObjectURL(blob);
+  const prev    = document.getElementById(previewId);
+  if (prev) { prev.src = blobUrl; prev.classList.add('show'); }
+
+  if (callback) {
+    const r = new FileReader(); r.onload = e => callback(e.target.result); r.readAsDataURL(blob);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -823,7 +932,7 @@ function applySDtoDOM() {
   if (SD.about.photo) {
     const frame = document.getElementById('about-frame');
     if (frame) {
-      frame.innerHTML  = `<img src="${SD.about.photo}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
+      frame.innerHTML  = `<img src="${SD.about.photo}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
       frame.style.fontSize = '0';
     }
   }
@@ -963,7 +1072,7 @@ async function goPage(page) {
 function renderSoins() {
   document.getElementById('soins-container').innerHTML = SD.soins.map(s => `
     <div class="soin-card">
-      ${s.photo ? `<img class="soin-img" src="${s.photo}" alt="${s.titre}">` : `<div class="soin-placeholder">${s.icon}</div>`}
+      ${s.photo ? `<img class="soin-img" src="${s.photo}" alt="${s.titre}" loading="lazy">` : `<div class="soin-placeholder">${s.icon}</div>`}
       <div class="soin-body"><h3>${s.titre}</h3><p>${s.desc}</p><span class="soin-tag">${s.tag}</span></div>
     </div>`).join('');
 }
@@ -990,7 +1099,7 @@ function rebuildCustom() {
     const div = document.createElement('div');
     div.className = 'page'; div.id = 'page-cp-' + p.id;
     div.innerHTML = `<div class="custom-wrap"><div class="custom-inner">
-      ${p.photo ? `<img class="custom-cover" src="${p.photo}" alt="">` : ''}
+      ${p.photo ? `<img class="custom-cover" src="${p.photo}" alt="" loading="lazy">` : ''}
       ${p.sub   ? `<span class="section-tag">${p.sub}</span>` : ''}
       <h1>${p.heading}</h1>
       <div class="custom-body">${p.body || ''}</div>
@@ -1230,12 +1339,32 @@ function removeSoin(id) {
 
 async function setSoinPhoto(input, id) {
   if (!input.files[0]) return;
-  const file = input.files[0];
-  const r = new FileReader();
-  r.onload = e => { const p = document.getElementById('s-pv-'+id); p.src = e.target.result; p.classList.add('show'); };
-  r.readAsDataURL(file);
+  const file   = input.files[0];
+  const origKB = Math.round(file.size / 1024);
+  const zone   = input.closest('.upload-zone');
+
+  if (navigator.vibrate) navigator.vibrate(10);
+  showCompressProgress(zone, 20, origKB, null);
+
+  let blob;
+  try { blob = await compressImage(file, { maxW: 1200, maxH: 1200, quality: 0.82 }); }
+  catch(e) { blob = file; }
+
+  const finalKB = Math.round(blob.size / 1024);
+  showCompressProgress(zone, 70, origKB, finalKB);
+
+  // Preview immédiate
+  const blobUrl = URL.createObjectURL(blob);
+  const p = document.getElementById('s-pv-'+id);
+  if (p) { p.src = blobUrl; p.classList.add('show'); }
+
+  showCompressProgress(zone, 90, origKB, finalKB);
   toast('📤 Upload photo…');
-  const url  = await uploadPhotoToStorage(file, 'soin-'+id);
+
+  const url  = await uploadPhotoToStorage(blob, 'soin-'+id, file.name);
+  showCompressProgress(zone, 100, origKB, finalKB);
+  setTimeout(() => hideCompressProgress(zone), 3000);
+
   const soin = SD.soins.find(s => s.id === id);
   if (soin) { soin.photo = url || null; buildSoinsAdmin(); toast('✓ Photo sauvegardée !'); }
 }
@@ -1333,7 +1462,7 @@ function saveHero() {
 function setAboutPhoto(src) {
   SD.about.photo = src;
   const frame = document.getElementById('about-frame');
-  frame.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
+  frame.innerHTML = `<img src="${src}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">`;
   frame.style.fontSize = '0';
   document.getElementById('about-photo-rm').style.display = 'inline-block';
 }
@@ -1530,6 +1659,9 @@ window.addEventListener('load', init);
     if (!ghost) return;
     cancelAnimationFrame(scrollRAF);
 
+    // Feedback haptique au drop
+    if (navigator.vibrate) navigator.vibrate([8, 40, 8]);
+
     // Supprimer le ghost
     ghost.remove(); ghost = null;
 
@@ -1563,6 +1695,9 @@ window.addEventListener('load', init);
     if (e.button !== undefined && e.button !== 0) return; // clic gauche seulement
     e.preventDefault();
     e.stopPropagation();
+
+    // Feedback haptique au début du drag (ignoré si non supporté)
+    if (navigator.vibrate) navigator.vibrate(12);
 
     const clientY = e.clientY ?? e.touches?.[0]?.clientY;
     const r = card.getBoundingClientRect();
