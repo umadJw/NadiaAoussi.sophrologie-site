@@ -159,6 +159,12 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 .admin-panel{display:none;}.admin-panel.active{display:block;}
 .acard{background:#fff;border-radius:14px;padding:24px 28px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
 .acard h4{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+/* ── DRAG & DROP ── */
+.drag-handle{cursor:grab;color:#bbb;padding:4px 8px;user-select:none;flex-shrink:0;
+  font-size:18px;line-height:1;border-radius:6px;transition:all .2s;touch-action:none;}
+.drag-handle:hover{color:var(--sage);background:rgba(125,155,118,.1);}
+.drag-handle:active{cursor:grabbing;color:var(--sage-dark);}
+.drag-item{transition:opacity .2s;}
 .af{margin-bottom:15px;}
 .af label{display:block;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;}
 .af input,.af textarea,.af select{width:100%;padding:11px 14px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Jost',sans-serif;font-size:14px;font-weight:300;color:var(--text);outline:none;transition:border-color .3s;background:#fafafa;}
@@ -1168,12 +1174,16 @@ function toast(msg = '✓ Enregistré !') {
 //  SOINS ADMIN
 // ═══════════════════════════════════════════════════════════
 
-function buildSoinsAdmin() { document.getElementById('soins-admin-list').innerHTML = SD.soins.map(s => buildSoinCard(s)).join(''); }
+function buildSoinsAdmin() {
+  document.getElementById('soins-admin-list').innerHTML = SD.soins.map(s => buildSoinCard(s)).join('');
+  activeDragSoins();
+}
 
 function buildSoinCard(s) {
   const hp = !!s.photo;
-  return `<div class="sac" id="sac-${s.id}">
+  return `<div class="sac drag-item" id="sac-${s.id}" data-id="${s.id}">
     <div class="sac-head" onclick="toggleSoin(${s.id})">
+      <span class="drag-handle" onclick="event.stopPropagation()" title="Déplacer">⠿</span>
       ${hp ? `<img class="sac-thumb" src="${s.photo}" alt="">` : `<div class="sac-emoji">${s.icon}</div>`}
       <span class="sac-label" id="sl-${s.id}">${s.titre}</span>
       <button class="sac-toggle" id="st-${s.id}">▾</button>
@@ -1208,6 +1218,7 @@ function addSoin() {
   const tmp  = document.createElement('div'); tmp.innerHTML = buildSoinCard(SD.soins[SD.soins.length-1]);
   list.appendChild(tmp.firstElementChild);
   list.lastElementChild.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  activeDragSoins(); // réactiver drag sur la nouvelle card
 }
 
 function removeSoin(id) {
@@ -1254,8 +1265,12 @@ function syncIdCounters() {
 function buildTarifsAdmin() {
   SD.tarifs.forEach(t => { if (!t.id) t.id = ++tarifIdC; });
   document.getElementById('tarifs-admin-list').innerHTML = SD.tarifs.map(t => `
-    <div class="acard" id="tac-${t.id}">
-      <h4><span>${t.titre} ${t.featured ? '⭐' : ''}</span>
+    <div class="acard drag-item" id="tac-${t.id}" data-id="${t.id}">
+      <h4>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span class="drag-handle" title="Déplacer">⠿</span>
+          ${t.titre} ${t.featured ? '⭐' : ''}
+        </span>
         <button class="btn-danger" style="font-size:11px;padding:5px 10px" onclick="removeTarif(${t.id})">✕ Supprimer</button>
       </h4>
       <div class="row2">
@@ -1266,6 +1281,7 @@ function buildTarifsAdmin() {
       <div class="af"><label>Inclusions (une par ligne)</label><textarea id="tf-f-${t.id}">${t.features.join('\n')}</textarea></div>
       <div class="af"><label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)"><input type="checkbox" id="tf-s-${t.id}" ${t.featured ? 'checked' : ''}> Mettre en avant</label></div>
     </div>`).join('');
+  activeDragTarifs();
 }
 
 function addTarif() {
@@ -1415,6 +1431,199 @@ async function init() {
 }
 
 window.addEventListener('load', init);
+
+// ═══════════════════════════════════════════════════════════
+//  DRAG & DROP FLUIDE — POINTER EVENTS (souris + touch)
+//  Pas de HTML5 drag API (trop limité) → on gère tout manuellement
+// ═══════════════════════════════════════════════════════════
+
+(function() {
+  // ── État global du drag ──────────────────────────────────
+  let ghost      = null;   // clone visuel qui suit le curseur
+  let dragCard   = null;   // card originale en cours de déplacement
+  let container  = null;   // liste parent
+  let dataArray  = null;   // SD.soins ou SD.tarifs
+  let saveFunc   = null;   // callback après drop
+  let placeholder= null;   // div fantôme qui montre où la card va se poser
+  let startY     = 0;
+  let offsetY    = 0;      // décalage curseur/coin haut de la card
+  let scrollRAF  = null;   // requestAnimationFrame pour auto-scroll
+  const SCROLL_ZONE = 80;  // px depuis le bord haut/bas pour déclencher le scroll
+  const SCROLL_SPEED = 10; // px par frame
+
+  // ── Crée le placeholder (ligne bleue animée) ─────────────
+  function makePlaceholder(height) {
+    const p = document.createElement('div');
+    p.style.cssText = `height:${height}px;border-radius:12px;background:rgba(125,155,118,.15);
+      border:2px dashed var(--sage-light);margin-bottom:12px;
+      transition:all .15s ease;pointer-events:none;`;
+    return p;
+  }
+
+  // ── Crée le ghost (clone semi-transparent qui suit la souris) ─
+  function makeGhost(card) {
+    const g = card.cloneNode(true);
+    const r = card.getBoundingClientRect();
+    g.style.cssText = `
+      position:fixed;top:${r.top}px;left:${r.left}px;
+      width:${r.width}px;opacity:.85;pointer-events:none;z-index:9999;
+      box-shadow:0 16px 48px rgba(0,0,0,.18);border-radius:14px;
+      transform:rotate(1.2deg) scale(1.02);
+      transition:transform .15s ease,box-shadow .15s ease;`;
+    document.body.appendChild(g);
+    return g;
+  }
+
+  // ── Auto-scroll pendant le drag ──────────────────────────
+  function autoScroll(clientY) {
+    cancelAnimationFrame(scrollRAF);
+    const winH = window.innerHeight;
+    if (clientY < SCROLL_ZONE) {
+      // Scroll vers le haut
+      scrollRAF = requestAnimationFrame(() => {
+        window.scrollBy(0, -SCROLL_SPEED * (1 - clientY / SCROLL_ZONE));
+        autoScroll(clientY);
+      });
+    } else if (clientY > winH - SCROLL_ZONE) {
+      // Scroll vers le bas
+      scrollRAF = requestAnimationFrame(() => {
+        window.scrollBy(0, SCROLL_SPEED * ((clientY - (winH - SCROLL_ZONE)) / SCROLL_ZONE));
+        autoScroll(clientY);
+      });
+    }
+  }
+
+  // ── Trouve où insérer le placeholder selon la position Y ─
+  function getDropTarget(clientY) {
+    const cards = [...container.querySelectorAll('.drag-item')].filter(c => c !== placeholder && c !== dragCard);
+    for (const c of cards) {
+      const r = c.getBoundingClientRect();
+      if (clientY < r.top + r.height / 2) return { before: c };
+    }
+    return { before: null }; // insérer à la fin
+  }
+
+  // ── pointermove ──────────────────────────────────────────
+  function onMove(e) {
+    if (!ghost) return;
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY;
+    if (clientY == null) return;
+    e.preventDefault();
+
+    // Déplacer le ghost
+    ghost.style.top = (clientY - offsetY) + 'px';
+
+    // Auto-scroll
+    autoScroll(clientY);
+
+    // Repositionner le placeholder
+    const { before } = getDropTarget(clientY);
+    if (before) {
+      container.insertBefore(placeholder, before);
+    } else {
+      container.appendChild(placeholder);
+    }
+  }
+
+  // ── pointerup / fin du drag ──────────────────────────────
+  function onUp() {
+    if (!ghost) return;
+    cancelAnimationFrame(scrollRAF);
+
+    // Supprimer le ghost
+    ghost.remove(); ghost = null;
+
+    // Remettre la card à la place du placeholder, restaurer son style
+    dragCard.style.opacity = '';
+    dragCard.style.pointerEvents = '';
+    container.insertBefore(dragCard, placeholder);
+    placeholder.remove(); placeholder = null;
+
+    // Relire l'ordre DOM → mettre à jour dataArray
+    const newOrder = [];
+    container.querySelectorAll('.drag-item').forEach(c => {
+      const id = parseInt(c.dataset.id);
+      const item = dataArray.find(x => x.id === id);
+      if (item) newOrder.push(item);
+    });
+    if (newOrder.length === dataArray.length) {
+      dataArray.length = 0;
+      newOrder.forEach(x => dataArray.push(x));
+      saveFunc();
+    }
+
+    dragCard = null; container = null;
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('touchmove', onMove, { passive: false });
+  }
+
+  // ── Démarre le drag depuis une poignée ───────────────────
+  function startDrag(e, card, cont, arr, save) {
+    if (e.button !== undefined && e.button !== 0) return; // clic gauche seulement
+    e.preventDefault();
+    e.stopPropagation();
+
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY;
+    const r = card.getBoundingClientRect();
+    offsetY   = clientY - r.top;
+    startY    = clientY;
+    dragCard  = card;
+    container = cont;
+    dataArray = arr;
+    saveFunc  = save;
+
+    // Masquer la card originale sur place
+    card.style.opacity = '0.35';
+    card.style.pointerEvents = 'none';
+
+    // Créer placeholder de même hauteur
+    placeholder = makePlaceholder(r.height);
+    container.insertBefore(placeholder, card.nextSibling);
+
+    // Créer le ghost
+    ghost = makeGhost(card);
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('touchmove', onMove, { passive: false });
+  }
+
+  // ── API publique : initialiser le drag sur un container ──
+  window.initDragDrop = function(containerId, arr, save) {
+    const cont = document.getElementById(containerId);
+    if (!cont) return;
+    cont.querySelectorAll('.drag-item').forEach(card => {
+      const handle = card.querySelector('.drag-handle');
+      if (!handle) return;
+      // Supprimer les anciens listeners en remplaçant le nœud handle
+      const h2 = handle.cloneNode(true);
+      handle.parentNode.replaceChild(h2, handle);
+      h2.addEventListener('pointerdown', e => startDrag(e, card, cont, arr, save));
+      h2.addEventListener('touchstart',  e => startDrag(e, card, cont, arr, save), { passive: false });
+    });
+  };
+})();
+
+function activeDragSoins() {
+  initDragDrop('soins-admin-list', SD.soins, () => {
+    renderSoins(); syncToCloud(); toast('✓ Ordre sauvegardé !');
+  });
+}
+
+function activeDragTarifs() {
+  initDragDrop('tarifs-admin-list', SD.tarifs, () => {
+    SD.tarifs.forEach(t => {
+      const ti=document.getElementById('tf-t-'+t.id), pr=document.getElementById('tf-p-'+t.id);
+      const du=document.getElementById('tf-d-'+t.id), fe=document.getElementById('tf-f-'+t.id);
+      const st=document.getElementById('tf-s-'+t.id);
+      if(ti)t.titre=ti.value; if(pr)t.prix=pr.value; if(du)t.duree=du.value;
+      if(fe)t.features=fe.value.split('\n').filter(f=>f.trim()); if(st)t.featured=st.checked;
+    });
+    renderTarifs(); syncToCloud(); toast('✓ Ordre sauvegardé !');
+  });
+}
+
 </script>
 </body>
 </html>
