@@ -898,9 +898,10 @@ function buildFooter() {
     a.onclick = () => goPage('cp-' + p.id);
     fl.appendChild(a);
   });
-  // Bouton admin toujours visible
+  // Bouton admin quasi invisible (même couleur que le fond)
   const adm = document.createElement('a');
-  adm.textContent = '⚙ Admin';
+  adm.textContent = '⚙';
+  adm.className = 'admin-link';
   adm.onclick = () => goPage('admin');
   fl.appendChild(adm);
 }
