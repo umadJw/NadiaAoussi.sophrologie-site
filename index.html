@@ -292,7 +292,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
   .mobile-menu{display:block;}
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1668,13 +1668,7 @@ async function init() {
   }
 }
 
-window.addEventListener('load', () => {
-  // Sécurité : s'assurer que la lib Supabase est bien chargée (defer)
-  if (typeof window.supabase === 'undefined') {
-    console.error('Supabase non chargé'); return;
-  }
-  init();
-});
+window.addEventListener('load', init);
 
 // ═══════════════════════════════════════════════════════════
 //  DRAG & DROP — COMPATIBLE iOS SAFARI + DESKTOP
