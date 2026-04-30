@@ -562,7 +562,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
           <div class="af"><label>Contenu</label><textarea id="np-body" style="height:140px" placeholder="Votre texte ici…"></textarea></div>
           <div class="af"><label>Image de couverture (optionnel)</label>
             <div class="upload-zone">
-              <input type="file" id="np-photo-file" accept="image/*" onchange="handlePhoto(this,'np-photo-prev',null)">
+              <input type="file" id="np-photo-file" accept="image/*" onchange="setSinglePhoto(this,'np-photo-prev','custom-page-'+Date.now(),url=>{document.getElementById('np-photo-prev').dataset.url=url},{ maxW:1400,maxH:900 })">
               <p class="upload-lbl">📷 Cliquez pour ajouter une image</p>
               <img id="np-photo-prev" class="upload-preview" src="" alt="">
             </div>
@@ -626,7 +626,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
     <div class="af"><label>Contenu</label><textarea id="em-body" style="height:150px"></textarea></div>
     <div class="af"><label>Image de couverture</label>
       <div class="upload-zone">
-        <input type="file" id="em-photo-file" accept="image/*" onchange="handlePhoto(this,'em-photo-prev',null)">
+        <input type="file" id="em-photo-file" accept="image/*" onchange="setSinglePhoto(this,'em-photo-prev','custom-page-'+Date.now(),url=>{document.getElementById('em-photo-prev').dataset.url=url},{ maxW:1400,maxH:900 })">
         <p class="upload-lbl">📷 Changer l'image</p>
         <img id="em-photo-prev" class="upload-preview" src="" alt="">
       </div>
@@ -1266,9 +1266,10 @@ function createCustomPage() {
   if (!nav || !head) { alert('Renseignez le libellé menu et le titre.'); return; }
   const id   = ++pageIdC;
   const prev = document.getElementById('np-photo-prev');
-  SD.customPages.push({ id, navTitle:nav, heading:head, sub:document.getElementById('np-sub').value.trim(), body:document.getElementById('np-body').value, photo:prev.classList.contains('show') ? prev.src : null, visible:true });
+  const photo = prev.dataset.url || (prev.classList.contains('show') && prev.src.startsWith('https://') ? prev.src : null);
+  SD.customPages.push({ id, navTitle:nav, heading:head, sub:document.getElementById('np-sub').value.trim(), body:document.getElementById('np-body').value, photo, visible:true });
   ['np-nav','np-heading','np-sub','np-body'].forEach(i => document.getElementById(i).value = '');
-  prev.src = ''; prev.classList.remove('show');
+  prev.src = ''; prev.classList.remove('show'); prev.dataset.url = '';
   rebuildCustom(); syncToCloud(); showPanel('p-cp-' + id);
 }
 
@@ -1292,14 +1293,18 @@ function saveEditPage() {
   p.sub      = document.getElementById('em-sub').value.trim();
   p.body     = document.getElementById('em-body').value;
   const prev = document.getElementById('em-photo-prev');
-  p.photo    = prev.classList.contains('show') ? prev.src : null;
+  p.photo = prev.dataset.url || (prev.classList.contains('show') && prev.src.startsWith('https://') ? prev.src : null);
   closeModal(); rebuildCustom(); syncToCloud();
 }
 
 function confirmDeletePage() { if (confirm('Supprimer cette page ?')) { const id = parseInt(document.getElementById('em-id').value); closeModal(); delPage(id); } }
 function confirmDel(id) { if (confirm('Supprimer cette page ?')) delPage(id); }
 function delPage(id) { SD.customPages = SD.customPages.filter(x => x.id !== id); rebuildCustom(); syncToCloud(); showPanel('p-pages'); }
-function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+function closeModal() {
+  document.getElementById('editModal').classList.remove('open');
+  const prev = document.getElementById('em-photo-prev');
+  if (prev) prev.dataset.url = '';
+}
 document.getElementById('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
 // ═══════════════════════════════════════════════════════════
