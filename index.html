@@ -247,6 +247,38 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
   .admin-sidebar{width:180px;padding:18px 10px;}.admin-content{padding:18px 20px;}
   footer{padding:36px 22px;}
 }
+
+/* ── MENU HAMBURGER MOBILE ───────────────────────────────── */
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:38px;height:38px;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;
+  transition:background .2s;}
+.hamburger:hover{background:rgba(125,155,118,.1);}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;
+  transition:all .3s ease;transform-origin:center;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* Drawer menu mobile */
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:190;
+  background:rgba(45,42,39,.5);backdrop-filter:blur(4px);opacity:0;transition:opacity .25s;}
+.mobile-menu.open{opacity:1;}
+.mobile-menu-panel{position:absolute;top:0;right:0;bottom:0;width:72vw;max-width:280px;
+  background:var(--cream);padding:80px 28px 40px;display:flex;flex-direction:column;gap:6px;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  box-shadow:-12px 0 48px rgba(0,0,0,.12);}
+.mobile-menu.open .mobile-menu-panel{transform:translateX(0);}
+.mobile-menu-panel a{font-size:15px;font-weight:400;letter-spacing:.06em;color:var(--text);
+  text-decoration:none;padding:13px 16px;border-radius:10px;cursor:pointer;
+  transition:all .2s;border:none;background:none;text-align:left;font-family:'Jost',sans-serif;}
+.mobile-menu-panel a:hover,.mobile-menu-panel a.active{background:rgba(125,155,118,.12);color:var(--sage-dark);}
+.mobile-menu-panel .m-cta{background:var(--sage);color:#fff;margin-top:8px;text-align:center;}
+.mobile-menu-panel .m-cta:hover{background:var(--sage-dark);}
+
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .mobile-menu{display:block;}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -259,7 +291,15 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 <nav>
   <div class="nav-logo" onclick="goPage('home')">Nadia Aoussi <span>Sophrologie</span></div>
   <ul id="navLinks"></ul>
+  <button class="hamburger" id="hamburgerBtn" aria-label="Menu" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- ═══ MENU MOBILE DRAWER ═══ -->
+<div class="mobile-menu" id="mobileMenu" onclick="closeMobileMenu(event)">
+  <div class="mobile-menu-panel" id="mobileMenuPanel"></div>
+</div>
 
 <!-- ═══ PAGE ACCUEIL ═══ -->
 <div class="page active" id="page-home">
@@ -994,7 +1034,50 @@ function buildNav() {
     const ctaLi = nl.querySelector('.nav-cta')?.parentElement;
     if (ctaLi) nl.insertBefore(li, ctaLi); else nl.appendChild(li);
   });
+  buildMobileMenu();
   buildFooter(); markActiveNav();
+}
+
+function buildMobileMenu() {
+  const panel = document.getElementById('mobileMenuPanel');
+  if (!panel) return;
+  panel.innerHTML = '';
+  FIXED_PAGES.forEach(key => {
+    if (!SD.navVisible[key]) return;
+    const a = document.createElement('a');
+    a.textContent = SD.navLabels[key];
+    a.id = 'mnav-' + key;
+    if (key === 'contact') a.className = 'm-cta';
+    a.onclick = () => { goPage(key); closeMobileMenu(); };
+    panel.appendChild(a);
+  });
+  SD.customPages.forEach(p => {
+    if (p.visible === false) return;
+    const a = document.createElement('a');
+    a.textContent = p.navTitle;
+    a.id = 'mnav-cp-' + p.id;
+    a.onclick = () => { goPage('cp-' + p.id); closeMobileMenu(); };
+    const cta = panel.querySelector('.m-cta');
+    if (cta) panel.insertBefore(a, cta); else panel.appendChild(a);
+  });
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn  = document.getElementById('hamburgerBtn');
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) { closeMobileMenu(); }
+  else { menu.classList.add('open'); btn.classList.add('open'); document.body.style.overflow = 'hidden'; }
+}
+
+function closeMobileMenu(e) {
+  // Ferme seulement si on clique sur le fond, pas sur le panel
+  if (e && document.getElementById('mobileMenuPanel').contains(e.target)) return;
+  const menu = document.getElementById('mobileMenu');
+  const btn  = document.getElementById('hamburgerBtn');
+  menu.classList.remove('open');
+  btn.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function buildFooter() {
@@ -1023,9 +1106,12 @@ function buildFooter() {
 
 function markActiveNav() {
   document.querySelectorAll('#navLinks a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('#mobileMenuPanel a').forEach(a => a.classList.remove('active'));
   const cur = document.body.dataset.page || 'home';
-  const el = document.getElementById('nav-' + cur) || document.getElementById('nav-cp-' + cur.replace('cp-',''));
+  const el  = document.getElementById('nav-' + cur) || document.getElementById('nav-cp-' + cur.replace('cp-',''));
   if (el) el.classList.add('active');
+  const mel = document.getElementById('mnav-' + cur) || document.getElementById('mnav-cp-' + cur.replace('cp-',''));
+  if (mel && !mel.classList.contains('m-cta')) mel.classList.add('active');
 }
 
 async function goPage(page) {
@@ -1034,6 +1120,9 @@ async function goPage(page) {
   if (el) el.classList.add('active');
   document.body.dataset.page = page;
   window.scrollTo(0, 0);
+  // Fermer le menu mobile si ouvert
+  const mMenu = document.getElementById('mobileMenu');
+  if (mMenu && mMenu.classList.contains('open')) closeMobileMenu();
   document.getElementById('mainFooter').style.display = page === 'admin' ? 'none' : 'block';
   markActiveNav();
 
@@ -1655,39 +1744,49 @@ window.addEventListener('load', init);
   }
 
   // ── pointerup / fin du drag ──────────────────────────────
-  function onUp() {
+  function onUp(e) {
     if (!ghost) return;
     cancelAnimationFrame(scrollRAF);
 
     // Feedback haptique au drop
     if (navigator.vibrate) navigator.vibrate([8, 40, 8]);
 
-    // Supprimer le ghost
-    ghost.remove(); ghost = null;
+    // Supprimer le ghost proprement
+    if (ghost && ghost.parentNode) ghost.remove();
+    ghost = null;
 
     // Remettre la card à la place du placeholder, restaurer son style
-    dragCard.style.opacity = '';
-    dragCard.style.pointerEvents = '';
-    container.insertBefore(dragCard, placeholder);
-    placeholder.remove(); placeholder = null;
+    if (dragCard) {
+      dragCard.style.opacity = '';
+      dragCard.style.pointerEvents = '';
+      if (placeholder && placeholder.parentNode) {
+        container.insertBefore(dragCard, placeholder);
+      }
+    }
+    if (placeholder && placeholder.parentNode) placeholder.remove();
+    placeholder = null;
 
     // Relire l'ordre DOM → mettre à jour dataArray
     const newOrder = [];
-    container.querySelectorAll('.drag-item').forEach(c => {
-      const id = parseInt(c.dataset.id);
-      const item = dataArray.find(x => x.id === id);
-      if (item) newOrder.push(item);
-    });
-    if (newOrder.length === dataArray.length) {
-      dataArray.length = 0;
-      newOrder.forEach(x => dataArray.push(x));
-      saveFunc();
+    if (container) {
+      container.querySelectorAll('.drag-item').forEach(c => {
+        const id = parseInt(c.dataset.id);
+        const item = dataArray.find(x => x.id === id);
+        if (item) newOrder.push(item);
+      });
+      if (newOrder.length === dataArray.length) {
+        dataArray.length = 0;
+        newOrder.forEach(x => dataArray.push(x));
+        saveFunc();
+      }
     }
 
     dragCard = null; container = null;
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup', onUp);
     window.removeEventListener('touchmove', onMove, { passive: false });
+    window.removeEventListener('touchend', onUp);
+    window.removeEventListener('touchcancel', onUp);
   }
 
   // ── Démarre le drag depuis une poignée ───────────────────
@@ -1722,6 +1821,8 @@ window.addEventListener('load', init);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+    window.addEventListener('touchcancel', onUp);
   }
 
   // ── API publique : initialiser le drag sur un container ──
