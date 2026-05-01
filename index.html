@@ -50,35 +50,80 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:20px 50px;display:fl
 
 /* ── HERO ── */
 .hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:120px 60px 80px;}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 40%,rgba(125,155,118,.12) 0%,transparent 60%),radial-gradient(ellipse 50% 80% at 20% 80%,rgba(201,133,108,.08) 0%,transparent 50%),var(--cream);}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 40%,rgba(74,107,71,.10) 0%,transparent 60%),radial-gradient(ellipse 50% 80% at 20% 80%,rgba(201,133,108,.07) 0%,transparent 50%),var(--cream);}
 
 /* ── ANIMATION RESPIRATOIRE — cohérence cardiaque 4s inspiration / 6s expiration ── */
-/* L'orbe principal : inspire (gonfle) sur 4s, expire (dégonfle) sur 6s = cycle 10s */
 @keyframes breathe-orb{
-  0%        { transform:translateY(-50%) scale(1);    opacity:.16; }
-  40%       { transform:translateY(-50%) scale(1.08); opacity:.22; } /* pic inspiration */
-  100%      { transform:translateY(-50%) scale(1);    opacity:.16; }
+  0%        { transform:translateY(-50%) scale(1);    opacity:.18; }
+  40%       { transform:translateY(-50%) scale(1.08); opacity:.26; }
+  100%      { transform:translateY(-50%) scale(1);    opacity:.18; }
 }
 @keyframes breathe-orb-photo{
   0%        { transform:translateY(-50%) scale(1); }
   40%       { transform:translateY(-50%) scale(1.06); }
   100%      { transform:translateY(-50%) scale(1); }
 }
-/* Le ring suit mais légèrement en retard — effet de profondeur */
-@keyframes breathe-ring{
-  0%        { transform:translateY(-50%) scale(1);    opacity:.22; }
-  40%       { transform:translateY(-50%) scale(1.1);  opacity:.35; }
-  100%      { transform:translateY(-50%) scale(1);    opacity:.22; }
+/* Rings : chacun respire légèrement décalé pour créer de la profondeur */
+@keyframes breathe-ring-1{
+  0%,100%   { transform:translateY(-50%) scale(1);    opacity:.55; }
+  40%       { transform:translateY(-50%) scale(1.09); opacity:.75; }
 }
-/* Timing : 40% de 10s = 4s inspiration, 60% = 6s expiration */
+@keyframes breathe-ring-2{
+  0%,100%   { transform:translateY(-50%) scale(1);    opacity:.30; }
+  40%       { transform:translateY(-50%) scale(1.14); opacity:.48; }
+}
+@keyframes breathe-ring-3{
+  0%,100%   { transform:translateY(-50%) scale(1);    opacity:.15; }
+  40%       { transform:translateY(-50%) scale(1.20); opacity:.28; }
+}
+/* Ripple au survol de l'orbe */
+@keyframes ripple-expand{
+  0%   { transform:translateY(-50%) scale(1.05); opacity:.6; }
+  100% { transform:translateY(-50%) scale(1.45); opacity:0; }
+}
+
 .hero-orb { animation: breathe-orb 10s cubic-bezier(0.4,0,0.6,1) infinite; }
 .hero-orb.has-photo { animation: breathe-orb-photo 10s cubic-bezier(0.4,0,0.6,1) infinite; }
-.hero-ring{ animation: breathe-ring 10s cubic-bezier(0.4,0,0.6,1) infinite; animation-delay:.8s; }
 
-.hero-orb{position:absolute;right:-100px;top:50%;width:620px;height:620px;border-radius:50%;background:linear-gradient(135deg,var(--sage-light),var(--sage-dark));opacity:.16;overflow:hidden;}
+/* Ring 1 — proche, net, visible */
+.hero-ring-1{
+  position:absolute;right:80px;top:50%;
+  width:460px;height:460px;border-radius:50%;
+  border:1.5px solid rgba(74,107,71,.55);
+  pointer-events:none;
+  animation: breathe-ring-1 10s cubic-bezier(0.4,0,0.6,1) infinite;
+  animation-delay:.6s;
+}
+/* Ring 2 — plus large, plus doux */
+.hero-ring-2{
+  position:absolute;right:20px;top:50%;
+  width:580px;height:580px;border-radius:50%;
+  border:1px solid rgba(74,107,71,.28);
+  pointer-events:none;
+  animation: breathe-ring-2 10s cubic-bezier(0.4,0,0.6,1) infinite;
+  animation-delay:1.4s;
+}
+/* Ring 3 — halo extérieur, très subtil */
+.hero-ring-3{
+  position:absolute;right:-40px;top:50%;
+  width:700px;height:700px;border-radius:50%;
+  border:1px solid rgba(74,107,71,.13);
+  pointer-events:none;
+  animation: breathe-ring-3 10s cubic-bezier(0.4,0,0.6,1) infinite;
+  animation-delay:2.2s;
+}
+/* Ring ripple — créé dynamiquement par JS au hover */
+.hero-ring-ripple{
+  position:absolute;right:80px;top:50%;
+  width:460px;height:460px;border-radius:50%;
+  border:2px solid rgba(74,107,71,.5);
+  pointer-events:none;
+  animation: ripple-expand 1.2s cubic-bezier(0.2,0.8,0.4,1) forwards;
+}
+
+.hero-orb{position:absolute;right:-100px;top:50%;width:620px;height:620px;border-radius:50%;background:linear-gradient(135deg,var(--sage-light),var(--sage-dark));opacity:.18;overflow:hidden;cursor:none;}
 .hero-orb.has-photo{opacity:1;box-shadow:0 32px 80px rgba(74,107,71,.2);}
 .hero-orb.has-photo img{display:block!important;}
-.hero-ring{position:absolute;right:80px;top:50%;width:460px;height:460px;border-radius:50%;border:1px solid rgba(125,155,118,.22);}
 .hero-content{position:relative;z-index:2;max-width:600px;}
 .hero-eyebrow{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);margin-bottom:24px;display:flex;align-items:center;gap:12px;}
 .hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--sage);}
@@ -332,7 +377,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 @media(max-width:768px){
   nav{padding:16px 20px;}#navLinks{display:none;}
   section{padding:60px 22px;}.hero{padding:100px 22px 60px;}
-  .hero-orb,.hero-ring{display:none;}
+  .hero-orb,.hero-ring-1,.hero-ring-2,.hero-ring-3{display:none;}
   .about-grid,.contact-grid{grid-template-columns:1fr;gap:40px;}
   .soins-grid,.tarifs-grid{grid-template-columns:1fr;}
   .tarif-card.featured{transform:none;}
@@ -401,7 +446,9 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
     <div class="hero-orb" id="hero-orb">
       <img id="hero-orb-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:0.85;">
     </div>
-    <div class="hero-ring"></div>
+    <div class="hero-ring-1" id="heroRing1"></div>
+    <div class="hero-ring-2"></div>
+    <div class="hero-ring-3"></div>
     <div class="hero-content">
       <p class="hero-eyebrow">Sophrologie &amp; bien-être</p>
       <h1 id="hero-title">Retrouvez votre <em>équilibre intérieur</em></h1>
