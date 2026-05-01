@@ -40,11 +40,34 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:20px 50px;display:fl
 /* ── HERO ── */
 .hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:120px 60px 80px;}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 40%,rgba(125,155,118,.12) 0%,transparent 60%),radial-gradient(ellipse 50% 80% at 20% 80%,rgba(201,133,108,.08) 0%,transparent 50%),var(--cream);}
-.hero-orb{position:absolute;right:-100px;top:50%;transform:translateY(-50%);width:620px;height:620px;border-radius:50%;background:linear-gradient(135deg,var(--sage-light),var(--sage-dark));opacity:.16;animation:breathe 6s ease-in-out infinite;overflow:hidden;}
+
+/* ── ANIMATION RESPIRATOIRE — cohérence cardiaque 4s inspiration / 6s expiration ── */
+/* L'orbe principal : inspire (gonfle) sur 4s, expire (dégonfle) sur 6s = cycle 10s */
+@keyframes breathe-orb{
+  0%        { transform:translateY(-50%) scale(1);    opacity:.16; }
+  40%       { transform:translateY(-50%) scale(1.08); opacity:.22; } /* pic inspiration */
+  100%      { transform:translateY(-50%) scale(1);    opacity:.16; }
+}
+@keyframes breathe-orb-photo{
+  0%        { transform:translateY(-50%) scale(1); }
+  40%       { transform:translateY(-50%) scale(1.06); }
+  100%      { transform:translateY(-50%) scale(1); }
+}
+/* Le ring suit mais légèrement en retard — effet de profondeur */
+@keyframes breathe-ring{
+  0%        { transform:translateY(-50%) scale(1);    opacity:.22; }
+  40%       { transform:translateY(-50%) scale(1.1);  opacity:.35; }
+  100%      { transform:translateY(-50%) scale(1);    opacity:.22; }
+}
+/* Timing : 40% de 10s = 4s inspiration, 60% = 6s expiration */
+.hero-orb { animation: breathe-orb 10s cubic-bezier(0.4,0,0.6,1) infinite; }
+.hero-orb.has-photo { animation: breathe-orb-photo 10s cubic-bezier(0.4,0,0.6,1) infinite; }
+.hero-ring{ animation: breathe-ring 10s cubic-bezier(0.4,0,0.6,1) infinite; animation-delay:.8s; }
+
+.hero-orb{position:absolute;right:-100px;top:50%;width:620px;height:620px;border-radius:50%;background:linear-gradient(135deg,var(--sage-light),var(--sage-dark));opacity:.16;overflow:hidden;}
 .hero-orb.has-photo{opacity:1;box-shadow:0 32px 80px rgba(74,107,71,.2);}
 .hero-orb.has-photo img{display:block!important;}
-.hero-ring{position:absolute;right:80px;top:50%;transform:translateY(-50%);width:460px;height:460px;border-radius:50%;border:1px solid rgba(125,155,118,.22);animation:breathe 8s ease-in-out infinite reverse;}
-@keyframes breathe{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-50%) scale(1.04)}}
+.hero-ring{position:absolute;right:80px;top:50%;width:460px;height:460px;border-radius:50%;border:1px solid rgba(125,155,118,.22);}
 .hero-content{position:relative;z-index:2;max-width:600px;}
 .hero-eyebrow{font-size:11px;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:var(--sage);margin-bottom:24px;display:flex;align-items:center;gap:12px;}
 .hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--sage);}
@@ -92,12 +115,26 @@ section{padding:90px 60px;}
 /* ── SOINS ── */
 .soins-bg{background:var(--sand);}
 .soins-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto;}
-.soin-card{background:#fff;border-radius:20px;overflow:hidden;transition:all .4s;border:1px solid transparent;position:relative;}
-.soin-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--sage-light),var(--sage-dark));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
-.soin-card:hover{transform:translateY(-5px);box-shadow:0 20px 56px rgba(74,107,71,.12);border-color:rgba(125,155,118,.2);}
+.soin-card{background:#fff;border-radius:20px;overflow:hidden;
+  transition:transform .5s cubic-bezier(0.34,1.28,0.64,1),
+             box-shadow .5s cubic-bezier(0.34,1.28,0.64,1),
+             border-color .4s ease;
+  border:1px solid transparent;position:relative;}
+.soin-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--sage-light),var(--sage-dark));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .5s cubic-bezier(0.34,1.28,0.64,1);}
+.soin-card:hover{
+  transform:translateY(-7px) scale(1.01);
+  box-shadow:0 24px 60px rgba(74,107,71,.13), 0 4px 16px rgba(74,107,71,.06);
+  border-color:rgba(125,155,118,.2);}
 .soin-card:hover::before{transform:scaleX(1);}
-.soin-img{width:100%;height:200px;object-fit:cover;display:block;}
-.soin-placeholder{width:100%;height:200px;display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(135deg,var(--sand),var(--sage-light));}
+.soin-img{width:100%;height:200px;object-fit:cover;display:block;
+  transition:transform .6s cubic-bezier(0.34,1.1,0.64,1);}
+.soin-card:hover .soin-img{transform:scale(1.04);}
+.soin-placeholder{width:100%;height:200px;display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(135deg,var(--sand),var(--sage-light));
+  transition:transform .5s cubic-bezier(0.34,1.28,0.64,1);}
+.soin-card:hover .soin-placeholder{transform:scale(1.03);}
 .soin-body{padding:28px 26px 26px;}
 .soin-card h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:10px;}
 .soin-card p{font-size:14px;line-height:1.75;color:var(--text-light);margin-bottom:18px;}
@@ -105,9 +142,18 @@ section{padding:90px 60px;}
 
 /* ── TARIFS ── */
 .tarifs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto;}
-.tarif-card{background:#fff;border-radius:20px;padding:36px 28px;text-align:center;border:1px solid var(--sand-dark);transition:all .4s;}
+.tarif-card{background:#fff;border-radius:20px;padding:36px 28px;text-align:center;border:1px solid var(--sand-dark);
+  transition:transform .5s cubic-bezier(0.34,1.28,0.64,1),
+             box-shadow .5s cubic-bezier(0.34,1.28,0.64,1),
+             border-color .4s ease;}
 .tarif-card.featured{background:var(--sage-dark);color:#fff;border-color:transparent;transform:scale(1.04);box-shadow:0 24px 60px rgba(74,107,71,.28);}
-.tarif-card:hover:not(.featured){border-color:var(--sage-light);transform:translateY(-4px);}
+.tarif-card:hover:not(.featured){
+  border-color:var(--sage-light);
+  transform:translateY(-6px) scale(1.01);
+  box-shadow:0 20px 52px rgba(74,107,71,.12), 0 4px 12px rgba(74,107,71,.05);}
+.tarif-card.featured:hover{
+  transform:scale(1.06);
+  box-shadow:0 32px 72px rgba(74,107,71,.36);}
 .tarif-card h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:18px;}
 .tarif-prix{font-family:'Cormorant Garamond',serif;font-size:50px;font-weight:300;line-height:1;margin-bottom:4px;}
 .tarif-prix sup{font-size:18px;vertical-align:top;margin-top:8px;}
@@ -115,9 +161,11 @@ section{padding:90px 60px;}
 .tarif-features{list-style:none;margin-bottom:28px;}
 .tarif-features li{font-size:13px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);color:var(--text-light);}
 .tarif-card.featured .tarif-features li{border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.75);}
-.btn-tarif{width:100%;padding:12px;border-radius:30px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .3s;border:1px solid var(--sage);background:transparent;color:var(--sage-dark);font-family:'Jost',sans-serif;}
+.btn-tarif{width:100%;padding:12px;border-radius:30px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  transition:all .4s cubic-bezier(0.34,1.28,0.64,1);
+  border:1px solid var(--sage);background:transparent;color:var(--sage-dark);font-family:'Jost',sans-serif;}
 .tarif-card.featured .btn-tarif{background:#fff;color:var(--sage-dark);border-color:#fff;}
-.btn-tarif:hover{background:var(--sage);color:#fff;}
+.btn-tarif:hover{background:var(--sage);color:#fff;transform:scale(1.03);}
 
 /* ── CONTACT ── */
 .contact-bg{background:var(--sand);}
@@ -139,6 +187,23 @@ section{padding:90px 60px;}
 .custom-inner h1 em{font-style:italic;color:var(--sage-dark);}
 .custom-body{font-size:16px;line-height:1.9;color:var(--text-light);white-space:pre-wrap;}
 .custom-cover{width:100%;max-height:420px;object-fit:cover;border-radius:20px;margin-bottom:40px;}
+
+/* ── SCROLLYTELLING — émergence progressive au scroll ─────── */
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  filter:blur(5px);
+  transition:opacity .85s cubic-bezier(0.22,1,0.36,1),
+             transform .85s cubic-bezier(0.22,1,0.36,1),
+             filter .85s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal.visible{opacity:1;transform:translateY(0);filter:blur(0);}
+.reveal-delay-1{transition-delay:.07s;}
+.reveal-delay-2{transition-delay:.14s;}
+.reveal-delay-3{transition-delay:.21s;}
+.reveal-delay-4{transition-delay:.28s;}
+.reveal-delay-5{transition-delay:.35s;}
+.reveal-delay-6{transition-delay:.42s;}
 
 /* ── FOOTER ── */
 footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
@@ -342,11 +407,11 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 <div class="page" id="page-about">
   <section style="padding-top:140px">
     <div class="about-grid">
-      <div class="about-visual">
+      <div class="about-visual reveal">
         <div class="about-img-frame" id="about-frame">🌿</div>
         <div class="about-badge" id="about-badge"><strong id="about-annees">10+</strong><span>Années d'expérience</span></div>
       </div>
-      <div class="about-text">
+      <div class="about-text reveal reveal-delay-2">
         <span class="section-tag">Votre sophrologue</span>
         <h2 id="about-title">Une approche <em>douce et personnalisée</em></h2>
         <p id="about-p1">Certifiée RNCP de niveau 5, je pratique la sophrologie depuis plus de 10 ans. Mon approche est bienveillante, à l'écoute de chaque personne dans sa singularité.</p>
@@ -360,7 +425,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 <!-- ═══ PAGE SOINS ═══ -->
 <div class="page" id="page-soins">
   <section class="soins-bg">
-    <div class="section-header">
+    <div class="section-header reveal">
       <span class="section-tag">Mes accompagnements</span>
       <h2 class="section-title" id="soins-heading">Des séances <em>adaptées</em> à vos besoins</h2>
       <div class="divider"></div>
@@ -372,7 +437,7 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 <!-- ═══ PAGE TARIFS ═══ -->
 <div class="page" id="page-tarifs">
   <section>
-    <div class="section-header">
+    <div class="section-header reveal">
       <span class="section-tag">Investir en soi</span>
       <h2 class="section-title" id="tarifs-heading">Mes <em>tarifs</em></h2>
       <p class="section-sub" id="tarifs-sub">Des formules adaptées à vos besoins et à votre rythme.</p>
@@ -385,20 +450,20 @@ footer{background:var(--text);color:#fff;padding:56px 60px;text-align:center;}
 <!-- ═══ PAGE CONTACT ═══ -->
 <div class="page" id="page-contact">
   <section class="contact-bg" style="padding-top:140px">
-    <div class="section-header">
+    <div class="section-header reveal">
       <span class="section-tag">Me contacter</span>
       <h2 class="section-title" id="contact-heading">Prendre <em>rendez-vous</em></h2>
       <div class="divider"></div>
     </div>
     <div class="contact-grid">
-      <div class="contact-info">
+      <div class="contact-info reveal">
         <h3 id="contact-title">Je suis à votre écoute</h3>
         <div class="contact-item"><div class="ci-icon">📍</div><div class="ci-text"><strong>Cabinet</strong><span id="contact-adresse">12 rue des Lilas, 75006 Paris</span></div></div>
         <div class="contact-item"><div class="ci-icon">📞</div><div class="ci-text"><strong>Téléphone</strong><span id="contact-tel">06 12 34 56 78</span></div></div>
         <div class="contact-item"><div class="ci-icon">✉️</div><div class="ci-text"><strong>Email</strong><span id="contact-email">contact@nadia-sophrologie.fr</span></div></div>
         <div class="contact-item"><div class="ci-icon">🕐</div><div class="ci-text"><strong>Horaires</strong><span id="contact-horaires">Lun–Ven : 9h–19h · Sam : 9h–13h</span></div></div>
       </div>
-      <div class="contact-form">
+      <div class="contact-form reveal reveal-delay-2">
         <form id="contactForm" action="https://formspree.io/f/xbdqeqyy" method="POST" onsubmit="submitForm(event)">
           <div class="fg"><label>Prénom et nom</label><input type="text" name="name" placeholder="Marie Dupont" required></div>
           <div class="fg"><label>Email</label><input type="email" name="email" placeholder="marie@email.com" required></div>
@@ -1165,6 +1230,8 @@ async function goPage(page) {
   if (mMenu && mMenu.classList.contains('open')) closeMobileMenu();
   document.getElementById('mainFooter').style.display = page === 'admin' ? 'none' : 'block';
   markActiveNav();
+  // Déclencher les animations scroll sur la nouvelle page
+  setTimeout(observeReveal, 50);
 
   // Mise à jour du hash dans l'URL (pour bookmarking)
   history.replaceState(null, '', page === 'home' ? '/' : '#' + page);
@@ -1199,22 +1266,24 @@ async function goPage(page) {
 // ═══════════════════════════════════════════════════════════
 
 function renderSoins() {
-  document.getElementById('soins-container').innerHTML = SD.soins.map(s => `
-    <div class="soin-card">
+  document.getElementById('soins-container').innerHTML = SD.soins.map((s, i) => `
+    <div class="soin-card reveal ${i > 0 ? 'reveal-delay-'+Math.min(i,6) : ''}">
       ${s.photo ? `<img class="soin-img" src="${s.photo}" alt="${s.titre}" loading="lazy">` : `<div class="soin-placeholder">${s.icon}</div>`}
       <div class="soin-body"><h3>${s.titre}</h3><p>${s.desc}</p><span class="soin-tag">${s.tag}</span></div>
     </div>`).join('');
+  setTimeout(observeReveal, 30);
 }
 
 function renderTarifs() {
   document.getElementById('tarifs-sub').textContent = SD.tarifs_sub;
-  document.getElementById('tarifs-container').innerHTML = SD.tarifs.map(t => `
-    <div class="tarif-card ${t.featured ? 'featured' : ''}">
+  document.getElementById('tarifs-container').innerHTML = SD.tarifs.map((t, i) => `
+    <div class="tarif-card ${t.featured ? 'featured' : ''} reveal ${i > 0 ? 'reveal-delay-'+Math.min(i,6) : ''}">
       <h3>${t.titre}</h3><div class="tarif-prix"><sup>€</sup>${t.prix}</div>
       <p class="tarif-duree">${t.duree}</p>
       <ul class="tarif-features">${t.features.map(f => `<li>${f}</li>`).join('')}</ul>
       <button class="btn-tarif" onclick="goPage('contact')">Réserver</button>
     </div>`).join('');
+  setTimeout(observeReveal, 30);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1731,6 +1800,28 @@ async function init() {
 }
 
 window.addEventListener('load', init);
+
+// ═══════════════════════════════════════════════════════════
+//  SCROLLYTELLING — Intersection Observer
+// ═══════════════════════════════════════════════════════════
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target); // une seule fois
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+function observeReveal() {
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+    revealObserver.observe(el);
+  });
+}
+
+
+
+
 
 // ═══════════════════════════════════════════════════════════
 //  DRAG & DROP — COMPATIBLE iOS SAFARI + DESKTOP
