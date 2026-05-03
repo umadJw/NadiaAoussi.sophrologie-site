@@ -643,7 +643,7 @@ SD.customPages.push({ id, navTitle:nav, heading:head, sub:document.getElementByI
 ['np-nav','np-heading','np-sub','np-body'].forEach(i => document.getElementById(i).value = '');
 prev.src = ''; prev.classList.remove('show'); prev.dataset.url = '';
 if (orbPrev) { orbPrev.src=''; orbPrev.classList.remove('show'); orbPrev.dataset.url=''; }
-rebuildCustom(); syncToCloud(); showPanel('p-cp-' + id);
+rebuildCustom(); syncToCloud(); setTimeout(() => showPanel('p-cp-' + id), 30);
 }
 function openEdit(id) {
 const p = SD.customPages.find(x => x.id === id); if (!p) return;
@@ -673,7 +673,7 @@ const prev = document.getElementById('em-photo-prev');
 p.photo = prev.dataset.url || (prev.classList.contains('show') && prev.src.startsWith('https://') ? prev.src : null);
 const orbPrev = document.getElementById('em-orb-photo-prev');
 if (orbPrev) p.orbPhoto = orbPrev.dataset.url || (orbPrev.classList.contains('show') && orbPrev.src.startsWith('https://') ? orbPrev.src : null);
-closeModal(); rebuildCustom(); syncToCloud();
+closeModal(); rebuildCustom(); syncToCloud(); setTimeout(() => showPanel('p-cp-' + id), 30);
 }
 function confirmDeletePage() { if (confirm('Supprimer cette page ?')) { const id = parseInt(document.getElementById('em-id').value); closeModal(); delPage(id); } }
 function confirmDel(id) { if (confirm('Supprimer cette page ?')) delPage(id); }
