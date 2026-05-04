@@ -261,10 +261,18 @@ if (info) info.classList.remove('show');
 }
 async function uploadPhotoToStorage(blob, path, origName) {
 if (!currentUser) { toast('⚠ Connectez-vous pour uploader'); return null; }
+// Forcer la récupération de la session active avant upload
+const { data: sessionData } = await sb.auth.getSession();
+if (!sessionData?.session) { toast('⚠ Session expirée, reconnectez-vous'); return null; }
 const ext      = blob.type === 'image/webp' ? 'webp' : 'jpg';
 const fileName = path + '_' + Date.now() + '.' + ext;
-const { error } = await sb.storage.from('site-photos').upload(fileName, blob, { upsert: true, contentType: blob.type });
-if (error) { console.error('Upload error:', error); toast('⚠ Erreur upload photo'); return null; }
+const { data, error } = await sb.storage.from('site-photos').upload(fileName, blob, { upsert: true, contentType: blob.type });
+if (error) {
+  console.error('Upload error complet:', JSON.stringify(error));
+  const msg = error.message || error.error || JSON.stringify(error);
+  toast('⚠ ' + msg);
+  return null;
+}
 const { data: urlData } = sb.storage.from('site-photos').getPublicUrl(fileName);
 return urlData.publicUrl;
 }
